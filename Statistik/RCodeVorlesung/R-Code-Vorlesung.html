@@ -1,0 +1,1509 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.0.36">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Florian Hartig">
+
+<title>R Code der Vorlesung BSc Statistik und Bioinformatik</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="R-Code-Vorlesung_files/libs/clipboard/clipboard.min.js"></script>
+<script src="R-Code-Vorlesung_files/libs/quarto-html/quarto.js"></script>
+<script src="R-Code-Vorlesung_files/libs/quarto-html/popper.min.js"></script>
+<script src="R-Code-Vorlesung_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="R-Code-Vorlesung_files/libs/quarto-html/anchor.min.js"></script>
+<link href="R-Code-Vorlesung_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="R-Code-Vorlesung_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="R-Code-Vorlesung_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="R-Code-Vorlesung_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="R-Code-Vorlesung_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#woche-1---univariate-deskriptive-statistik" id="toc-woche-1---univariate-deskriptive-statistik" class="nav-link active" data-scroll-target="#woche-1---univariate-deskriptive-statistik">Woche 1 - Univariate deskriptive Statistik</a>
+  <ul class="collapse">
+  <li><a href="#einführung-r" id="toc-einführung-r" class="nav-link" data-scroll-target="#einführung-r">Einführung R</a></li>
+  <li><a href="#ihre-daten" id="toc-ihre-daten" class="nav-link" data-scroll-target="#ihre-daten">Ihre Daten</a></li>
+  </ul></li>
+  <li><a href="#woche-2---korrelation-und-assoziation" id="toc-woche-2---korrelation-und-assoziation" class="nav-link" data-scroll-target="#woche-2---korrelation-und-assoziation">Woche 2 - Korrelation und Assoziation</a>
+  <ul class="collapse">
+  <li><a href="#kat-kat" id="toc-kat-kat" class="nav-link" data-scroll-target="#kat-kat">kat ~ kat</a></li>
+  <li><a href="#kat-num" id="toc-kat-num" class="nav-link" data-scroll-target="#kat-num">kat ~ num</a></li>
+  <li><a href="#num-num" id="toc-num-num" class="nav-link" data-scroll-target="#num-num">num ~ num</a></li>
+  </ul></li>
+  <li><a href="#woche-3---hypothesentests" id="toc-woche-3---hypothesentests" class="nav-link" data-scroll-target="#woche-3---hypothesentests">Woche 3 - Hypothesentests</a>
+  <ul class="collapse">
+  <li><a href="#kategorisch-kategorisch" id="toc-kategorisch-kategorisch" class="nav-link" data-scroll-target="#kategorisch-kategorisch">Kategorisch + kategorisch</a></li>
+  <li><a href="#kategorisch-numerisch" id="toc-kategorisch-numerisch" class="nav-link" data-scroll-target="#kategorisch-numerisch">Kategorisch + Numerisch</a></li>
+  <li><a href="#numerischnumerisch" id="toc-numerischnumerisch" class="nav-link" data-scroll-target="#numerischnumerisch">Numerisch+Numerisch</a></li>
+  <li><a href="#statistische-power" id="toc-statistische-power" class="nav-link" data-scroll-target="#statistische-power">Statistische power</a></li>
+  </ul></li>
+  <li><a href="#woche-4---mle-und-regression" id="toc-woche-4---mle-und-regression" class="nav-link" data-scroll-target="#woche-4---mle-und-regression">Woche 4 - MLE und Regression</a>
+  <ul class="collapse">
+  <li><a href="#num-num-1" id="toc-num-num-1" class="nav-link" data-scroll-target="#num-num-1">num + num</a>
+  <ul class="collapse">
+  <li><a href="#körpergewicht-körpergröße" id="toc-körpergewicht-körpergröße" class="nav-link" data-scroll-target="#körpergewicht-körpergröße">Körpergewicht ~ Körpergröße</a></li>
+  <li><a href="#körpergewicht-einwohner" id="toc-körpergewicht-einwohner" class="nav-link" data-scroll-target="#körpergewicht-einwohner">Körpergewicht ~ Einwohner</a></li>
+  </ul></li>
+  <li><a href="#num-kat" id="toc-num-kat" class="nav-link" data-scroll-target="#num-kat">num + kat</a></li>
+  </ul></li>
+  <li><a href="#woche-5---multiple-regression" id="toc-woche-5---multiple-regression" class="nav-link" data-scroll-target="#woche-5---multiple-regression">Woche 5 - Multiple Regression</a>
+  <ul class="collapse">
+  <li><a href="#dienstag" id="toc-dienstag" class="nav-link" data-scroll-target="#dienstag">Dienstag</a></li>
+  <li><a href="#donnerstag" id="toc-donnerstag" class="nav-link" data-scroll-target="#donnerstag">Donnerstag</a>
+  <ul class="collapse">
+  <li><a href="#beispiel-lrt" id="toc-beispiel-lrt" class="nav-link" data-scroll-target="#beispiel-lrt">Beispiel LRT</a></li>
+  <li><a href="#analyse-ihrer-daten" id="toc-analyse-ihrer-daten" class="nav-link" data-scroll-target="#analyse-ihrer-daten">Analyse Ihrer Daten</a></li>
+  <li><a href="#körpergewicht-vegetarier" id="toc-körpergewicht-vegetarier" class="nav-link" data-scroll-target="#körpergewicht-vegetarier">Körpergewicht ~ Vegetarier</a></li>
+  <li><a href="#körpergewicht-verkehrsmittel" id="toc-körpergewicht-verkehrsmittel" class="nav-link" data-scroll-target="#körpergewicht-verkehrsmittel">Körpergewicht ~ Verkehrsmittel</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#woche-6---glm" id="toc-woche-6---glm" class="nav-link" data-scroll-target="#woche-6---glm">Woche 6 - GLM</a>
+  <ul class="collapse">
+  <li><a href="#dienstag-1" id="toc-dienstag-1" class="nav-link" data-scroll-target="#dienstag-1">Dienstag</a></li>
+  </ul></li>
+  </ul>
+</nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">R Code der Vorlesung BSc Statistik und Bioinformatik</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Florian Hartig </p>
+          </div>
+  </div>
+    
+    
+  </div>
+  
+<div>
+  <div class="abstract">
+    <div class="abstract-title">Abstract</div>
+    Dieses Dokument fasst den in der Vorlesung live vorgeführten R Code zusammen. Das pdf wird im Laufe der Vorlesung ergänzt. Wichtig: es handelt sich hier um eine Sammlung von Code, nicht um ein Lehrbuch. Insbesondere kann dieses Dokument die in der Vorlesung gegebene mündliche Erklärung der Motivation / Outputs nicht ersetzen. Bezüglich letztere verweise ich auf Ihre Mitschriften, die Vorlesungsunterlagen und das Skript.
+  </div>
+</div>
+
+</header>
+
+<div class="cell">
+
+</div>
+<section id="woche-1---univariate-deskriptive-statistik" class="level1">
+<h1>Woche 1 - Univariate deskriptive Statistik</h1>
+<section id="einführung-r" class="level2">
+<h2 class="anchored" data-anchor-id="einführung-r">Einführung R</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span><span class="sc">+</span><span class="dv">2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 4</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sqrt</span>(<span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1.732051</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>(<span class="dv">2</span><span class="sc">+</span><span class="dv">2</span>)<span class="sc">*</span><span class="dv">2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 8</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">=</span> <span class="dv">5</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>var1 <span class="ot">=</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>,<span class="dv">4</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(var1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 2.5</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sd</span>(var1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1.290994</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Das ist ein Kommentar</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="fu">quantile</span>(var1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  0%  25%  50%  75% 100% 
+1.00 1.75 2.50 3.25 4.00 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>var2 <span class="ot">=</span> <span class="fu">factor</span>(<span class="fu">c</span>(<span class="st">"rot"</span>, <span class="st">"gelb"</span>, <span class="st">"gruen"</span>, <span class="st">"blau"</span>))</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(var1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "numeric"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(var2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "factor"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">=</span> <span class="fu">data.frame</span>(<span class="at">var1 =</span> var1, <span class="at">var2 =</span> var2)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Zugriff über $</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>dat<span class="sc">$</span>var1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1 2 3 4</code></pre>
+</div>
+</div>
+</section>
+<section id="ihre-daten" class="level2">
+<h2 class="anchored" data-anchor-id="ihre-daten">Ihre Daten</h2>
+<p>Für des Einlesen der echten Daten</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>daten <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"../Daten/Biostatistik Umfrage 2022.csv"</span>, <span class="at">stringsAsFactors =</span> T, <span class="at">na.strings =</span> <span class="fu">c</span>(<span class="st">""</span>))</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>daten<span class="sc">$</span>Zeitstempel <span class="ot">=</span> <span class="cn">NULL</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(daten) <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"Einwohner"</span>, <span class="st">"Distanz"</span>, <span class="st">"Körpergröße"</span>, <span class="st">"Körpergewicht"</span>, <span class="st">"Geschlecht"</span>, <span class="st">"Händigkeit"</span>, <span class="st">"Wohnform"</span>, <span class="st">"Verkehrsmittel"</span>,  <span class="st">"Getränk"</span>, <span class="st">"Vegetarier"</span>,<span class="st">"Studium"</span>, <span class="st">"CO2_Steuer"</span>, <span class="st">"Parkplatzgebühr"</span>, <span class="st">"Atomkraftwerke"</span>, <span class="st">"CRISPR-Cas"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Code für das Einlesen der randomisierten Daten, die als csv File auf GRIPS verfügbar sind (natürlich müssten Sie den Pfad so anpassen, dass es für Ihren Computer passt).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>daten <span class="ot">=</span> <span class="fu">read.csv</span>(<span class="at">file =</span> <span class="st">"./Biostatistik Umfrage 2022 Randomisiert.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Verkehrsmittel</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">=</span> <span class="fu">table</span>(daten<span class="sc">$</span>Verkehrsmittel)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">barplot</span>(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pie</span>(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-5-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Getränk</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">=</span> <span class="fu">table</span>(daten<span class="sc">$</span>Getränk)</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+                  Bier Cocktails / Longdrinks                    Tee 
+                    12                      4                     21 
+                 Waser                   Wein 
+                    27                      5 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">barplot</span>(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pie</span>(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-6-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Wohnform</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">=</span> <span class="fu">table</span>(daten<span class="sc">$</span>Wohnform)</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+                           allein   in einer großen WG &gt; 3 Personen 
+                               26                                11 
+in einer kleinen WG &lt;= 3 Personen                        Mit Eltern 
+                               20                                 6 
+                      Mit Partner 
+                                7 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">4</span>,<span class="dv">15</span>,<span class="dv">4</span>,<span class="dv">4</span>))</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">barplot</span>(x, <span class="at">las =</span> <span class="dv">2</span>, <span class="at">horiz =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Andere nominale Variablen</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(daten<span class="sc">$</span>Händigkeit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+ Linkshänder Rechtshänder 
+           2           68 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(daten<span class="sc">$</span>Vegetarier)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+  Ja Nein 
+  26   44 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(daten<span class="sc">$</span>Geschlecht)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Männlich Weiblich 
+      16       54 </code></pre>
+</div>
+</div>
+<p>Distanz</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(daten<span class="sc">$</span>Distanz, <span class="at">breaks =</span> <span class="dv">20</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(daten<span class="sc">$</span>Distanz)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 165.2</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">median</span>(daten<span class="sc">$</span>Distanz)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 115.5</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sd</span>(daten<span class="sc">$</span>Distanz)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 161.1062</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">quantile</span>(daten<span class="sc">$</span>Distanz)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   0%   25%   50%   75%  100% 
+  0.0  81.0 115.5 186.0 901.0 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">var</span>(daten<span class="sc">$</span>Distanz)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 25955.21</code></pre>
+</div>
+</div>
+<p>Körpergröße</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(daten<span class="sc">$</span>Körpergröße, <span class="at">breaks =</span> <span class="dv">20</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(daten<span class="sc">$</span>Körpergröße)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 170.8714</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">median</span>(daten<span class="sc">$</span>Körpergröße)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 169</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">quantile</span>(daten<span class="sc">$</span>Körpergröße[daten<span class="sc">$</span>Geschlecht <span class="sc">==</span> <span class="st">"Weiblich"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    0%    25%    50%    75%   100% 
+157.00 162.25 168.00 171.75 183.00 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">boxplot</span>(daten<span class="sc">$</span>Körpergröße)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-10-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+</section>
+<section id="woche-2---korrelation-und-assoziation" class="level1">
+<h1>Woche 2 - Korrelation und Assoziation</h1>
+<section id="kat-kat" class="level2">
+<h2 class="anchored" data-anchor-id="kat-kat">kat ~ kat</h2>
+<p>Geschlecht ~ Getränk</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">=</span> <span class="fu">table</span>(daten<span class="sc">$</span>Geschlecht, daten<span class="sc">$</span>Getränk)</span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a><span class="fu">barplot</span>(x, <span class="at">beside =</span> T, <span class="at">las =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mosaicplot</span>(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-11-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Vegetarier ~ Geschlecht</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">=</span> <span class="fu">table</span>(daten<span class="sc">$</span>Vegetarier, daten<span class="sc">$</span>Geschlecht)</span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a><span class="fu">barplot</span>(x, <span class="at">beside =</span> T, <span class="at">las =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mosaicplot</span>(<span class="fu">t</span>(x))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-12-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="kat-num" class="level2">
+<h2 class="anchored" data-anchor-id="kat-num">kat ~ num</h2>
+<p>Körpergröße~Vegetarier</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="fu">boxplot</span>(Körpergröße<span class="sc">~</span>Vegetarier, <span class="at">data =</span> daten, <span class="at">notch =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>CO2_Steuer~Geschlecht + Vegetarier</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="fu">boxplot</span>(CO2_Steuer<span class="sc">~</span>Geschlecht <span class="sc">+</span> Vegetarier, <span class="at">data =</span> daten, <span class="at">notch =</span> T, <span class="at">las =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in (function (z, notch = FALSE, width = NULL, varwidth = FALSE, : some
+notches went outside hinges ('box'): maybe set notch=FALSE</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="num-num" class="level2">
+<h2 class="anchored" data-anchor-id="num-num">num ~ num</h2>
+<p>Körpergewicht ~ Körpergröße</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(Körpergewicht <span class="sc">~</span> Körpergröße, <span class="at">data =</span> daten)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(daten<span class="sc">$</span>Körpergröße, daten<span class="sc">$</span>Körpergewicht, <span class="at">use =</span> <span class="st">"complete.obs"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.6940096</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor.test</span>(daten<span class="sc">$</span>Körpergröße, daten<span class="sc">$</span>Körpergewicht, <span class="at">use =</span> <span class="st">"complete.obs"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Pearson's product-moment correlation
+
+data:  daten$Körpergröße and daten$Körpergewicht
+t = 7.7116, df = 64, p-value = 1.04e-10
+alternative hypothesis: true correlation is not equal to 0
+95 percent confidence interval:
+ 0.5432238 0.8014246
+sample estimates:
+      cor 
+0.6940096 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(daten<span class="sc">$</span>Körpergröße, daten<span class="sc">$</span>Körpergewicht, <span class="at">use =</span> <span class="st">"complete.obs"</span>, <span class="at">method =</span> <span class="st">"spearman"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.6714341</code></pre>
+</div>
+</div>
+<p>log(Einwohner) ~ Distanz</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">log</span>(Einwohner) <span class="sc">~</span> Distanz, <span class="at">data =</span> daten)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(<span class="fu">log</span>(daten<span class="sc">$</span>Einwohner), daten<span class="sc">$</span>Distanz)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.1234761</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(<span class="fu">log</span>(daten<span class="sc">$</span>Einwohner), daten<span class="sc">$</span>Distanz, <span class="at">method =</span> <span class="st">"spearman"</span> )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.01179438</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="woche-3---hypothesentests" class="level1">
+<h1>Woche 3 - Hypothesentests</h1>
+<section id="kategorisch-kategorisch" class="level3">
+<h3 class="anchored" data-anchor-id="kategorisch-kategorisch">Kategorisch + kategorisch</h3>
+<section id="vegetarier-und-verkehrsmittel" class="level4">
+<h4 class="anchored" data-anchor-id="vegetarier-und-verkehrsmittel">Vegetarier und Verkehrsmittel</h4>
+<p><strong>Frage:</strong> Gibt es einen signifikanten Unterschied zwischen den Verhältnissen von Vegetarier zu nicht-Vegetarier in ihrer Wahl der Verkehrsmittel?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb74"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">=</span> <span class="fu">table</span>(daten<span class="sc">$</span>Vegetarier, daten<span class="sc">$</span>Verkehrsmittel)</span>
+<span id="cb74-2"><a href="#cb74-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      
+       Auto Bus Fahrad Zu Fuß
+  Ja      0  15      8      3
+  Nein    5  21      9      9</code></pre>
+</div>
+</div>
+<p>Visualisierung via boxplot/barplot:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a><span class="fu">barplot</span>(x, <span class="at">beside =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p><strong>Test:</strong> prop.test</p>
+<p><strong>H0:</strong> Gleiche Verhältnisse (Veg/Non-Veg) in mehreren Gruppen (Verkehrsmittel).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb77"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a><span class="fu">prop.test</span>(<span class="fu">t</span>(x))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in prop.test(t(x)): Chi-squared approximation may be incorrect</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    4-sample test for equality of proportions without continuity correction
+
+data:  t(x)
+X-squared = 4.7439, df = 3, p-value = 0.1915
+alternative hypothesis: two.sided
+sample estimates:
+   prop 1    prop 2    prop 3    prop 4 
+0.0000000 0.4166667 0.4705882 0.2500000 </code></pre>
+</div>
+</div>
+<p>p-value = 0.7936 und damit größer als unser Signifikanzniveau <span class="math inline">\(\alpha\)</span> = 0.05 und wir lehnen die H0 nicht ab, d.h. die Unterschiede zwischen den verschiedenen Verhältnissen ist nicht signifikant</p>
+</section>
+<section id="geschlecht-und-vegetarier" class="level4">
+<h4 class="anchored" data-anchor-id="geschlecht-und-vegetarier">Geschlecht und Vegetarier</h4>
+<p><strong>Frage:</strong> Gibt es einen signifikanten Unterschied zwischen den Verhältnissen von Vegetarier zu nicht-Vegetarier in Abhaengigkeit des Geschlechtes?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb80"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">=</span> <span class="fu">table</span>(daten<span class="sc">$</span>Geschlecht, daten<span class="sc">$</span>Vegetarier)</span>
+<span id="cb80-2"><a href="#cb80-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>          
+           Ja Nein
+  Männlich  3   13
+  Weiblich 23   31</code></pre>
+</div>
+</div>
+<p>Visualisierung via boxplot/barplot:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb82"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a><span class="fu">barplot</span>(x, <span class="at">beside =</span> T, <span class="at">las =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p><strong>Test:</strong> prop.test</p>
+<p><strong>H0:</strong> Gleiche Verhältnisse (Veg/Non-Veg) in mehreren Gruppen (Geschlecht-W, Geschlecht-M).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb83"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a><span class="fu">prop.test</span>(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    2-sample test for equality of proportions with continuity correction
+
+data:  x
+X-squared = 2.0709, df = 1, p-value = 0.1501
+alternative hypothesis: two.sided
+95 percent confidence interval:
+ -0.51125090  0.03439904
+sample estimates:
+   prop 1    prop 2 
+0.1875000 0.4259259 </code></pre>
+</div>
+</div>
+<p>p-value = 0.359 und damit größer als unser Signifikanzniveau <span class="math inline">\(\alpha\)</span> = 0.05 und wir lehnen die H0 nicht ab, d.h. die Unterschiede zwischen den verschiedenen Verhältnissen ist nicht signifikant</p>
+</section>
+</section>
+<section id="kategorisch-numerisch" class="level3">
+<h3 class="anchored" data-anchor-id="kategorisch-numerisch">Kategorisch + Numerisch</h3>
+<section id="körpergröße-geschlecht" class="level4">
+<h4 class="anchored" data-anchor-id="körpergröße-geschlecht">Körpergröße ~ Geschlecht</h4>
+<p><strong>Frage:</strong> Gibt es einen signifikanten Unterschied in der Körpergröße in Abhängigkeit des Geschlechtes?</p>
+<p>Visualisierung via boxplot</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb85"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true" tabindex="-1"></a><span class="fu">boxplot</span>(Körpergröße <span class="sc">~</span> Geschlecht, <span class="at">data =</span> daten, <span class="at">col =</span> <span class="st">"lightgrey"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-23-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="callout-warning callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Warning
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Wir können von einem normalen Boxplot nicht ablesen, ob der Unterschied signifikant ist! Wieso? Es fehlen essenzielle Informationen wie die Standardabweichung/Varianz der Mittelwerte!</p>
+</div>
+</div>
+<p><strong>Test:</strong> t-Test</p>
+<p>Bevor wir den t-Test jedoch anwenden können, müssen wir erst prüfen ob die Normalverteilungsannahme der Körpergrößen in den zwei Geschlechtskategorieren erfüllt ist.</p>
+<section id="shapiro-wilk-test" class="level5">
+<h5 class="anchored" data-anchor-id="shapiro-wilk-test">Shapiro-Wilk test</h5>
+<p>Shapiro-Wilk testet auf Normalverteilung, d.h. die <strong>H0 ist dass die Daten normalverteilt sind.</strong> Ist der shapiro test signifikant, lehnen wir die H0 ab und akzeptieren die alternativ Hypothese dass die Daten nicht normalverteilt sind:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb86"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a><span class="fu">shapiro.test</span>(daten<span class="sc">$</span>Körpergröße[daten<span class="sc">$</span>Geschlecht <span class="sc">==</span> <span class="st">"Weiblich"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Shapiro-Wilk normality test
+
+data:  daten$Körpergröße[daten$Geschlecht == "Weiblich"]
+W = 0.97189, p-value = 0.2331</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb88"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a><span class="fu">shapiro.test</span>(daten<span class="sc">$</span>Körpergröße[daten<span class="sc">$</span>Geschlecht <span class="sc">==</span> <span class="st">"Männlich"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Shapiro-Wilk normality test
+
+data:  daten$Körpergröße[daten$Geschlecht == "Männlich"]
+W = 0.96729, p-value = 0.7931</code></pre>
+</div>
+</div>
+<p>p-values <span class="math inline">\(&gt;0.05\)</span> und damit lehnen wir H0 nicht ab, gehen von Normalverteilungen aus und können den t-test anwenden</p>
+</section>
+<section id="t-test" class="level5">
+<h5 class="anchored" data-anchor-id="t-test">T-test</h5>
+<p><strong>H0:</strong> Kein Unterschied in den Mittelwerten, d.h. gleiche Körpergrößen</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb90"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a>?t.test</span>
+<span id="cb90-2"><a href="#cb90-2" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>(Körpergröße <span class="sc">~</span> Geschlecht, <span class="at">data =</span> daten)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Welch Two Sample t-test
+
+data:  Körpergröße by Geschlecht
+t = 6.5281, df = 20.933, p-value = 1.847e-06
+alternative hypothesis: true difference in means between group Männlich and group Weiblich is not equal to 0
+95 percent confidence interval:
+  9.332623 18.060895
+sample estimates:
+mean in group Männlich mean in group Weiblich 
+              181.4375               167.7407 </code></pre>
+</div>
+</div>
+<p>Der p-value entspricht 0.1526 und ist damit <span class="math inline">\(&gt;0.05\)</span>. Wir lehnen deshalb die H0 nicht ab und unsere Aussage ist “Der Unterschied in den Körpergrößen von und weiblichen Studierenden war nicht signifikant (t-test, p = 0.1526)”</p>
+<div class="callout-important callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Nur weil ein Effekt nicht signifikant ist, heißt das nicht, dass es keinen Effekt gibt! Denken Sie an die Vorlesung! Das heißt es wäre falsch etwas wie “es gibt keinen Unterschied zwischen männlichen und weiblichen Studierenden zu schreiben”, der Unterschied beträgt 2.99 ist aber statistisch nicht signifikant.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="körpergröße-händigkeit" class="level4">
+<h4 class="anchored" data-anchor-id="körpergröße-händigkeit">Körpergröße ~ Händigkeit</h4>
+<p><strong>Frage:</strong> Gibt es einen signifikanten Unterschied in der Körpergröße in Abhaengigkeit der Händigkeit?</p>
+<div class="callout-tip callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Mit `library(‘Name-der-library’) können wir zusätzliche Funktionen laden (ähnlich wie wenn sie in einem Betriebssystem eine zusätzliche Software öffnen und verwenden).</p>
+</div>
+</div>
+<p>Visualisierung:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb92"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(beeswarm)</span>
+<span id="cb92-2"><a href="#cb92-2" aria-hidden="true" tabindex="-1"></a><span class="fu">boxplot</span>(Körpergröße <span class="sc">~</span> Händigkeit, <span class="at">data =</span> daten, <span class="at">notch =</span> T, <span class="at">col =</span> <span class="st">"lightgrey"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in (function (z, notch = FALSE, width = NULL, varwidth = FALSE, : some
+notches went outside hinges ('box'): maybe set notch=FALSE</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb94"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true" tabindex="-1"></a><span class="fu">beeswarm</span>(Körpergröße <span class="sc">~</span> Händigkeit, <span class="at">data =</span> daten, <span class="at">add =</span> T, <span class="at">pwcol =</span> daten<span class="sc">$</span>Geschlecht)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-26-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p><strong>H0:</strong> Kein Unterschied.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb95"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb95-1"><a href="#cb95-1" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>(Körpergröße <span class="sc">~</span> Händigkeit, <span class="at">data =</span> daten)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Welch Two Sample t-test
+
+data:  Körpergröße by Händigkeit
+t = -1.4191, df = 1.1128, p-value = 0.3731
+alternative hypothesis: true difference in means between group Linkshänder and group Rechtshänder is not equal to 0
+95 percent confidence interval:
+ -52.92639  39.80874
+sample estimates:
+ mean in group Linkshänder mean in group Rechtshänder 
+                  164.5000                   171.0588 </code></pre>
+</div>
+</div>
+<p>und damit signifikant, d.h. wir lehnen die H0 ab und wir schreiben “Der Unterschied in der Körpergröße von Linkshändern und Rechtshändern ist signifikant (t-test, p=5.99E-06)”</p>
+<div class="callout-tip callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>p-Wert würde kleiner wenn man ein-seitig testet, sollte man aber nur a priori und nicht auf Grundlage der Plots machen, weil letzteres verdecktes multiples Testen ist</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb97"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb97-1"><a href="#cb97-1" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>(Körpergröße <span class="sc">~</span> Händigkeit, <span class="at">data =</span> daten, <span class="at">alternative =</span> <span class="st">"less"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Welch Two Sample t-test
+
+data:  Körpergröße by Händigkeit
+t = -1.4191, df = 1.1128, p-value = 0.1866
+alternative hypothesis: true difference in means between group Linkshänder and group Rechtshänder is less than 0
+95 percent confidence interval:
+     -Inf 18.08185
+sample estimates:
+ mean in group Linkshänder mean in group Rechtshänder 
+                  164.5000                   171.0588 </code></pre>
+</div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="numerischnumerisch" class="level3">
+<h3 class="anchored" data-anchor-id="numerischnumerisch">Numerisch+Numerisch</h3>
+<section id="körpergröße-einwohner" class="level4">
+<h4 class="anchored" data-anchor-id="körpergröße-einwohner">Körpergröße ~ Einwohner</h4>
+<p>Visualisierung via scatterplot:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb99"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb99-1"><a href="#cb99-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(Körpergröße <span class="sc">~</span> Einwohner, <span class="at">data =</span>daten)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-29-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Berechnen wir den Pearson Korrelationsfaktor:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb100"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb100-1"><a href="#cb100-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(daten<span class="sc">$</span>Einwohner, daten<span class="sc">$</span>Körpergröße, <span class="at">use =</span> <span class="st">"complete.obs"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.06165126</code></pre>
+</div>
+</div>
+<p>Schwache Korrelation, ist sie signifikant? Wir können die <code>cor.test</code> hernehmen um einen Korrelationstest zu berechnen (H0: Korrelation = 0):</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb102"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb102-1"><a href="#cb102-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor.test</span>(daten<span class="sc">$</span>Einwohner, daten<span class="sc">$</span>Körpergröße, <span class="at">use =</span> <span class="st">"complete.obs"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Pearson's product-moment correlation
+
+data:  daten$Einwohner and daten$Körpergröße
+t = 0.50936, df = 68, p-value = 0.6122
+alternative hypothesis: true correlation is not equal to 0
+95 percent confidence interval:
+ -0.1758705  0.2923896
+sample estimates:
+       cor 
+0.06165126 </code></pre>
+</div>
+</div>
+<p>p-value ist <span class="math inline">\(&gt;\)</span> 0.05 und damit ist die Korrelation nicht signifikant.</p>
+<div class="callout-note callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Ein kleiner Ausblick auf die kommenden Wochen: wir koennen die sogenannte lineare Regression ( <span class="math inline">\(y = mx + t\)</span> ) dazu nutzen um die Assoziation von Koerpergrosse ~ Einwohner durch eine Gerade darzustellen. D.h. in der linearen Regression werden die zwei Parameter <span class="math inline">\(m\)</span> (Steigung) und <span class="math inline">\(t\)</span> (Achsenabschnitt) geschätzt:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb104"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb104-1"><a href="#cb104-1" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(Körpergröße <span class="sc">~</span> Einwohner, <span class="at">data =</span>daten)</span>
+<span id="cb104-2"><a href="#cb104-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(Körpergröße <span class="sc">~</span> Einwohner, <span class="at">data =</span>daten)</span>
+<span id="cb104-3"><a href="#cb104-3" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(fit, <span class="at">col =</span> <span class="st">"red"</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-32-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="statistische-power" class="level2">
+<h2 class="anchored" data-anchor-id="statistische-power">Statistische power</h2>
+<p>Die Power wird zum Beispiel von der standardabweichung/varianz der Daten beeinflusst:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb105"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb105-1"><a href="#cb105-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sd</span>(daten<span class="sc">$</span>Körpergröße)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 8.674336</code></pre>
+</div>
+</div>
+<p>nehme vereinfacht an, dass 4 Beobachten je Gruppe gab. Ungleiche Gruppen hat die Funktion leider nicht. Wie viel n bräuchten wir bei der gegeben Streuung, um für einen Effekt von delta = 2 eine Power von 80% zu erreichen?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb107"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true" tabindex="-1"></a><span class="fu">power.t.test</span>(<span class="at">delta =</span> <span class="dv">2</span>, <span class="at">sd =</span> <span class="dv">8</span>, <span class="at">power =</span> <span class="fl">0.8</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+     Two-sample t test power calculation 
+
+              n = 252.1281
+          delta = 2
+             sd = 8
+      sig.level = 0.05
+          power = 0.8
+    alternative = two.sided
+
+NOTE: n is number in *each* group</code></pre>
+</div>
+</div>
+<p>delta = wahre Unterschied der Gruppen</p>
+</section>
+</section>
+<section id="woche-4---mle-und-regression" class="level1">
+<h1>Woche 4 - MLE und Regression</h1>
+<section id="num-num-1" class="level2">
+<h2 class="anchored" data-anchor-id="num-num-1">num + num</h2>
+<section id="körpergewicht-körpergröße" class="level3">
+<h3 class="anchored" data-anchor-id="körpergewicht-körpergröße">Körpergewicht ~ Körpergröße</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb109"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb109-1"><a href="#cb109-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(daten<span class="sc">$</span>Körpergröße, daten<span class="sc">$</span>Körpergewicht)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-35-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb110"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb110-1"><a href="#cb110-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor.test</span>(daten<span class="sc">$</span>Körpergewicht, daten<span class="sc">$</span>Körpergröße, </span>
+<span id="cb110-2"><a href="#cb110-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">use =</span> <span class="st">"complete.obs"</span>, <span class="at">method =</span> <span class="st">"spearman"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in cor.test.default(daten$Körpergewicht, daten$Körpergröße, : Cannot
+compute exact p-value with ties</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Spearman's rank correlation rho
+
+data:  daten$Körpergewicht and daten$Körpergröße
+S = 15740, p-value = 6.811e-10
+alternative hypothesis: true rho is not equal to 0
+sample estimates:
+      rho 
+0.6714341 </code></pre>
+</div>
+</div>
+<p>Lineare Regression</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb113"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb113-1"><a href="#cb113-1" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(Körpergewicht <span class="sc">~</span> Körpergröße, <span class="at">data =</span> daten)</span>
+<span id="cb113-2"><a href="#cb113-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = Körpergewicht ~ Körpergröße, data = daten)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-12.454  -6.085  -1.091   3.610  31.346 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept) -88.4489    19.8080  -4.465 3.32e-05 ***
+Körpergröße   0.8909     0.1155   7.712 1.04e-10 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 8.148 on 64 degrees of freedom
+  (4 observations deleted due to missingness)
+Multiple R-squared:  0.4816,    Adjusted R-squared:  0.4736 
+F-statistic: 59.47 on 1 and 64 DF,  p-value: 1.04e-10</code></pre>
+</div>
+</div>
+<p>Visualisierung</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb115"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb115-1"><a href="#cb115-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(daten<span class="sc">$</span>Körpergröße, daten<span class="sc">$</span>Körpergewicht)</span>
+<span id="cb115-2"><a href="#cb115-2" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(fit, <span class="at">col =</span> <span class="st">"red"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-37-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>alternative Visualisierung</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb116"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb116-1"><a href="#cb116-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(effects)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: carData</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>lattice theme set by effectsTheme()
+See ?effectsTheme for details.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb119"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb119-1"><a href="#cb119-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">allEffects</span>(fit, <span class="at">partial.residuals =</span> T))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-38-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="körpergewicht-einwohner" class="level3">
+<h3 class="anchored" data-anchor-id="körpergewicht-einwohner">Körpergewicht ~ Einwohner</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb120"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb120-1"><a href="#cb120-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(daten<span class="sc">$</span>Einwohner, daten<span class="sc">$</span>Körpergewicht)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-39-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb121"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb121-1"><a href="#cb121-1" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(Körpergewicht <span class="sc">~</span> Einwohner, <span class="at">data =</span> daten)</span>
+<span id="cb121-2"><a href="#cb121-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = Körpergewicht ~ Einwohner, data = daten)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-17.353  -9.276  -1.320   5.643  35.672 
+
+Coefficients:
+              Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)  6.436e+01  1.463e+00  43.977   &lt;2e-16 ***
+Einwohner   -1.405e-06  2.571e-06  -0.546    0.587    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 11.29 on 64 degrees of freedom
+  (4 observations deleted due to missingness)
+Multiple R-squared:  0.004645,  Adjusted R-squared:  -0.01091 
+F-statistic: 0.2987 on 1 and 64 DF,  p-value: 0.5866</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb123"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb123-1"><a href="#cb123-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(effects)</span>
+<span id="cb123-2"><a href="#cb123-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">allEffects</span>(fit, <span class="at">partial.residuals =</span> T))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-41-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+</section>
+<section id="num-kat" class="level2">
+<h2 class="anchored" data-anchor-id="num-kat">num + kat</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb124"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb124-1"><a href="#cb124-1" aria-hidden="true" tabindex="-1"></a><span class="fu">boxplot</span>(Körpergewicht <span class="sc">~</span> Geschlecht, <span class="at">data =</span> daten, <span class="at">notch =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in (function (z, notch = FALSE, width = NULL, varwidth = FALSE, : some
+notches went outside hinges ('box'): maybe set notch=FALSE</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-42-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb126"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb126-1"><a href="#cb126-1" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(Körpergewicht <span class="sc">~</span> Geschlecht, <span class="at">data =</span> daten)</span>
+<span id="cb126-2"><a href="#cb126-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = Körpergewicht ~ Geschlecht, data = daten)
+
+Residuals:
+   Min     1Q Median     3Q    Max 
+-12.50  -5.25  -1.50   5.25  24.50 
+
+Coefficients:
+                   Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)          78.500      1.932  40.641  &lt; 2e-16 ***
+GeschlechtWeiblich  -19.000      2.219  -8.562 3.31e-12 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 7.726 on 64 degrees of freedom
+  (4 observations deleted due to missingness)
+Multiple R-squared:  0.5339,    Adjusted R-squared:  0.5266 
+F-statistic:  73.3 on 1 and 64 DF,  p-value: 3.311e-12</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb128"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb128-1"><a href="#cb128-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(effects)</span>
+<span id="cb128-2"><a href="#cb128-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">allEffects</span>(fit, <span class="at">partial.residuals =</span> T))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-43-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb129"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb129-1"><a href="#cb129-1" aria-hidden="true" tabindex="-1"></a><span class="fu">boxplot</span>(Körpergewicht <span class="sc">~</span> Verkehrsmittel, <span class="at">data =</span> daten, <span class="at">notch =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in (function (z, notch = FALSE, width = NULL, varwidth = FALSE, : some
+notches went outside hinges ('box'): maybe set notch=FALSE</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-44-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb131"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb131-1"><a href="#cb131-1" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(Körpergewicht <span class="sc">~</span> Verkehrsmittel, <span class="at">data =</span> daten)</span>
+<span id="cb131-2"><a href="#cb131-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = Körpergewicht ~ Verkehrsmittel, data = daten)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-16.657  -8.333  -2.995   4.924  36.343 
+
+Coefficients:
+                     Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)            73.800      4.974  14.838   &lt;2e-16 ***
+VerkehrsmittelBus     -10.143      5.317  -1.908   0.0611 .  
+VerkehrsmittelFahrad  -11.467      5.743  -1.997   0.0503 .  
+VerkehrsmittelZu Fuß  -10.255      5.999  -1.710   0.0924 .  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 11.12 on 62 degrees of freedom
+  (4 observations deleted due to missingness)
+Multiple R-squared:  0.06436,   Adjusted R-squared:  0.01909 
+F-statistic: 1.422 on 3 and 62 DF,  p-value: 0.245</code></pre>
+</div>
+</div>
+<p>ANOVA</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb133"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb133-1"><a href="#cb133-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">aov</span>(fit))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>               Df Sum Sq Mean Sq F value Pr(&gt;F)
+Verkehrsmittel  3    528   175.8   1.422  0.245
+Residuals      62   7669   123.7               
+4 observations deleted due to missingness</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="woche-5---multiple-regression" class="level1">
+<h1>Woche 5 - Multiple Regression</h1>
+<section id="dienstag" class="level2">
+<h2 class="anchored" data-anchor-id="dienstag">Dienstag</h2>
+<p>Beispiel multiple Regression</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb135"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb135-1"><a href="#cb135-1" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(Ozone <span class="sc">~</span> Temp <span class="sc">+</span> Wind, <span class="at">data =</span> airquality)</span>
+<span id="cb135-2"><a href="#cb135-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = Ozone ~ Temp + Wind, data = airquality)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-41.251 -13.695  -2.856  11.390 100.367 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept) -71.0332    23.5780  -3.013   0.0032 ** 
+Temp          1.8402     0.2500   7.362 3.15e-11 ***
+Wind         -3.0555     0.6633  -4.607 1.08e-05 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 21.85 on 113 degrees of freedom
+  (37 observations deleted due to missingness)
+Multiple R-squared:  0.5687,    Adjusted R-squared:  0.5611 
+F-statistic:  74.5 on 2 and 113 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+<p>Vergleich einfache Regression</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb137"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb137-1"><a href="#cb137-1" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(Ozone <span class="sc">~</span> Temp , <span class="at">data =</span> airquality)</span>
+<span id="cb137-2"><a href="#cb137-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = Ozone ~ Temp, data = airquality)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-40.729 -17.409  -0.587  11.306 118.271 
+
+Coefficients:
+             Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept) -146.9955    18.2872  -8.038 9.37e-13 ***
+Temp           2.4287     0.2331  10.418  &lt; 2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 23.71 on 114 degrees of freedom
+  (37 observations deleted due to missingness)
+Multiple R-squared:  0.4877,    Adjusted R-squared:  0.4832 
+F-statistic: 108.5 on 1 and 114 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+<p>Die Unterschiede in den Effektschätzern entstehen durch die Kollinearität zwischen Wind und Temperatur</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb139"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb139-1"><a href="#cb139-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(Temp <span class="sc">~</span> Wind, <span class="at">data =</span> airquality)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-48-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="donnerstag" class="level2">
+<h2 class="anchored" data-anchor-id="donnerstag">Donnerstag</h2>
+<section id="beispiel-lrt" class="level3">
+<h3 class="anchored" data-anchor-id="beispiel-lrt">Beispiel LRT</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb140"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb140-1"><a href="#cb140-1" aria-hidden="true" tabindex="-1"></a>ratios <span class="ot">=</span> <span class="fu">rep</span>(<span class="cn">NA</span>, <span class="dv">1000</span>)</span>
+<span id="cb140-2"><a href="#cb140-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">1000</span>){</span>
+<span id="cb140-3"><a href="#cb140-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># erzeuge Daten ohne Abhängigkeit</span></span>
+<span id="cb140-4"><a href="#cb140-4" aria-hidden="true" tabindex="-1"></a>  x <span class="ot">=</span> <span class="fu">rnorm</span>(<span class="dv">100</span>)</span>
+<span id="cb140-5"><a href="#cb140-5" aria-hidden="true" tabindex="-1"></a>  y <span class="ot">=</span> <span class="fu">rnorm</span>(<span class="dv">100</span>)</span>
+<span id="cb140-6"><a href="#cb140-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># vergleiche Log Likelihood M1 = y ~ x , M0 = y ~ 1</span></span>
+<span id="cb140-7"><a href="#cb140-7" aria-hidden="true" tabindex="-1"></a>  ratios[i] <span class="ot">=</span> <span class="fu">logLik</span>(<span class="fu">lm</span>(y <span class="sc">~</span> x))  <span class="sc">-</span> <span class="fu">logLik</span>(<span class="fu">lm</span>(y <span class="sc">~</span> <span class="dv">1</span>))</span>
+<span id="cb140-8"><a href="#cb140-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb140-9"><a href="#cb140-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb140-10"><a href="#cb140-10" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(ratios, <span class="at">breaks =</span> <span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-49-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="analyse-ihrer-daten" class="level3">
+<h3 class="anchored" data-anchor-id="analyse-ihrer-daten">Analyse Ihrer Daten</h3>
+</section>
+<section id="körpergewicht-vegetarier" class="level3">
+<h3 class="anchored" data-anchor-id="körpergewicht-vegetarier">Körpergewicht ~ Vegetarier</h3>
+<p>Einfache Regression</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb141"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb141-1"><a href="#cb141-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(Körpergewicht <span class="sc">~</span> Vegetarier, <span class="at">data =</span>daten, <span class="at">col =</span> <span class="st">"lightgrey"</span>, <span class="at">notch =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-50-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb142"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb142-1"><a href="#cb142-1" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(Körpergewicht <span class="sc">~</span> Vegetarier, <span class="at">data =</span>daten)</span>
+<span id="cb142-2"><a href="#cb142-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = Körpergewicht ~ Vegetarier, data = daten)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-14.725  -7.615  -2.725   4.275  34.275 
+
+Coefficients:
+               Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)      61.615      2.183  28.224   &lt;2e-16 ***
+VegetarierNein    4.110      2.804   1.466    0.148    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 11.13 on 64 degrees of freedom
+  (4 observations deleted due to missingness)
+Multiple R-squared:  0.03247,   Adjusted R-squared:  0.01735 
+F-statistic: 2.148 on 1 and 64 DF,  p-value: 0.1477</code></pre>
+</div>
+</div>
+<p>Könnte Scheinkorrelation sein wegen Vegetarier ~ Geschlecht, deshalb multiple Regression</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb144"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb144-1"><a href="#cb144-1" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(Körpergewicht <span class="sc">~</span> Vegetarier <span class="sc">+</span> Geschlecht, <span class="at">data =</span>daten)</span>
+<span id="cb144-2"><a href="#cb144-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = Körpergewicht ~ Vegetarier + Geschlecht, data = daten)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-12.525  -5.211  -1.495   5.197  24.573 
+
+Coefficients:
+                   Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)         78.3906     2.5464  30.785  &lt; 2e-16 ***
+VegetarierNein       0.1346     2.0202   0.067    0.947    
+GeschlechtWeiblich -18.9633     2.3034  -8.233  1.4e-11 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 7.787 on 63 degrees of freedom
+  (4 observations deleted due to missingness)
+Multiple R-squared:  0.5339,    Adjusted R-squared:  0.5191 
+F-statistic: 36.08 on 2 and 63 DF,  p-value: 3.605e-11</code></pre>
+</div>
+</div>
+</section>
+<section id="körpergewicht-verkehrsmittel" class="level3">
+<h3 class="anchored" data-anchor-id="körpergewicht-verkehrsmittel">Körpergewicht ~ Verkehrsmittel</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb146"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb146-1"><a href="#cb146-1" aria-hidden="true" tabindex="-1"></a><span class="fu">boxplot</span>(Körpergewicht <span class="sc">~</span> Verkehrsmittel, <span class="at">data =</span>daten)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-52-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb147"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb147-1"><a href="#cb147-1" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(Körpergewicht <span class="sc">~</span> Verkehrsmittel, <span class="at">data =</span>daten)</span>
+<span id="cb147-2"><a href="#cb147-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = Körpergewicht ~ Verkehrsmittel, data = daten)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-16.657  -8.333  -2.995   4.924  36.343 
+
+Coefficients:
+                     Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)            73.800      4.974  14.838   &lt;2e-16 ***
+VerkehrsmittelBus     -10.143      5.317  -1.908   0.0611 .  
+VerkehrsmittelFahrad  -11.467      5.743  -1.997   0.0503 .  
+VerkehrsmittelZu Fuß  -10.255      5.999  -1.710   0.0924 .  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 11.12 on 62 degrees of freedom
+  (4 observations deleted due to missingness)
+Multiple R-squared:  0.06436,   Adjusted R-squared:  0.01909 
+F-statistic: 1.422 on 3 and 62 DF,  p-value: 0.245</code></pre>
+</div>
+</div>
+<p>Auch hier haben wir nach Diskussion in der Klasse überlegt, ob dies eine Scheinkorrelation sein könnte, wegen Verkehrsmittel ~ Geschlecht, ev. Distanz.</p>
+<p>Multiple Regression und Kreuztabelle bestätigt das</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb149"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb149-1"><a href="#cb149-1" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(Körpergewicht <span class="sc">~</span> Verkehrsmittel <span class="sc">+</span> Geschlecht <span class="sc">+</span> Distanz, <span class="at">data =</span>daten)</span>
+<span id="cb149-2"><a href="#cb149-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = Körpergewicht ~ Verkehrsmittel + Geschlecht + Distanz, 
+    data = daten)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-12.854  -5.602  -1.084   4.129  23.293 
+
+Coefficients:
+                       Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)           82.824000   3.729507  22.208  &lt; 2e-16 ***
+VerkehrsmittelBus     -2.860039   3.803256  -0.752    0.455    
+VerkehrsmittelFahrad  -5.855272   4.079951  -1.435    0.156    
+VerkehrsmittelZu Fuß  -2.996018   4.288149  -0.699    0.487    
+GeschlechtWeiblich   -18.420651   2.296416  -8.021  4.5e-11 ***
+Distanz               -0.008448   0.005898  -1.432    0.157    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 7.716 on 60 degrees of freedom
+  (4 observations deleted due to missingness)
+Multiple R-squared:  0.5642,    Adjusted R-squared:  0.5279 
+F-statistic: 15.53 on 5 and 60 DF,  p-value: 8.736e-10</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb151"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb151-1"><a href="#cb151-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(daten<span class="sc">$</span>Geschlecht, daten<span class="sc">$</span>Verkehrsmittel)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>          
+           Auto Bus Fahrad Zu Fuß
+  Männlich    3   7      4      2
+  Weiblich    2  29     13     10</code></pre>
+</div>
+</div>
+<p>Final noch ein Beispiel für die Modellselektion - Geschlecht wird selektiert, eine zufällige Variable nicht.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb153"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb153-1"><a href="#cb153-1" aria-hidden="true" tabindex="-1"></a>daten<span class="sc">$</span>random <span class="ot">=</span> <span class="fu">rnorm</span>(<span class="fu">nrow</span>(daten))</span>
+<span id="cb153-2"><a href="#cb153-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb153-3"><a href="#cb153-3" aria-hidden="true" tabindex="-1"></a>M0 <span class="ot">&lt;-</span> <span class="fu">lm</span>(Körpergewicht <span class="sc">~</span> Verkehrsmittel, <span class="at">data =</span>daten)</span>
+<span id="cb153-4"><a href="#cb153-4" aria-hidden="true" tabindex="-1"></a>M1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(Körpergewicht <span class="sc">~</span> Verkehrsmittel <span class="sc">+</span> Geschlecht , <span class="at">data =</span>daten)</span>
+<span id="cb153-5"><a href="#cb153-5" aria-hidden="true" tabindex="-1"></a>M2 <span class="ot">&lt;-</span> <span class="fu">lm</span>(Körpergewicht <span class="sc">~</span> Verkehrsmittel <span class="sc">+</span> random , <span class="at">data =</span>daten)</span>
+<span id="cb153-6"><a href="#cb153-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb153-7"><a href="#cb153-7" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">aov</span>(M2))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>               Df Sum Sq Mean Sq F value Pr(&gt;F)
+Verkehrsmittel  3    528  175.84   1.399  0.252
+random          1      0    0.02   0.000  0.989
+Residuals      61   7669  125.72               
+4 observations deleted due to missingness</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb155"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb155-1"><a href="#cb155-1" aria-hidden="true" tabindex="-1"></a><span class="fu">AIC</span>(M0)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 511.1466</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb157"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb157-1"><a href="#cb157-1" aria-hidden="true" tabindex="-1"></a><span class="fu">AIC</span>(M1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 464.9424</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb159"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb159-1"><a href="#cb159-1" aria-hidden="true" tabindex="-1"></a><span class="fu">AIC</span>(M2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 513.1464</code></pre>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="woche-6---glm" class="level1">
+<h1>Woche 6 - GLM</h1>
+<section id="dienstag-1" class="level2">
+<h2 class="anchored" data-anchor-id="dienstag-1">Dienstag</h2>
+<p>Interessieren uns für die Assoziazion Veg ~ Geschlecht. Erinnerung: deskriptiv über Kreuztabelle + gruppiertes Balkendiagram</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb161"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb161-1"><a href="#cb161-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">=</span> <span class="fu">table</span>(daten<span class="sc">$</span>Vegetarier, daten<span class="sc">$</span>Geschlecht)</span>
+<span id="cb161-2"><a href="#cb161-2" aria-hidden="true" tabindex="-1"></a>x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      
+       Männlich Weiblich
+  Ja          3       23
+  Nein       13       31</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb163"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb163-1"><a href="#cb163-1" aria-hidden="true" tabindex="-1"></a><span class="fu">barplot</span>(x, <span class="at">beside =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-55-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Könnten einen Hypothesentest machen</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb164"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb164-1"><a href="#cb164-1" aria-hidden="true" tabindex="-1"></a><span class="fu">prop.test</span>(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    2-sample test for equality of proportions with continuity correction
+
+data:  x
+X-squared = 2.0709, df = 1, p-value = 0.1501
+alternative hypothesis: two.sided
+95 percent confidence interval:
+ -0.3930226  0.0328827
+sample estimates:
+   prop 1    prop 2 
+0.1153846 0.2954545 </code></pre>
+</div>
+</div>
+<p>Aber regression ist allgeiner. Abhängige Variable ist 0/1, deshalb logische Regression:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb166"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb166-1"><a href="#cb166-1" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">glm</span>(Vegetarier <span class="sc">~</span> Geschlecht, </span>
+<span id="cb166-2"><a href="#cb166-2" aria-hidden="true" tabindex="-1"></a>           <span class="at">family =</span> <span class="st">"binomial"</span>,</span>
+<span id="cb166-3"><a href="#cb166-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">data =</span> daten)</span>
+<span id="cb166-4"><a href="#cb166-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+glm(formula = Vegetarier ~ Geschlecht, family = "binomial", data = daten)
+
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-1.8297  -1.3065   0.6444   1.0536   1.0536  
+
+Coefficients:
+                   Estimate Std. Error z value Pr(&gt;|z|)  
+(Intercept)          1.4663     0.6405   2.289   0.0221 *
+GeschlechtWeiblich  -1.1678     0.6971  -1.675   0.0939 .
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 92.360  on 69  degrees of freedom
+Residual deviance: 89.113  on 68  degrees of freedom
+AIC: 93.113
+
+Number of Fisher Scoring iterations: 4</code></pre>
+</div>
+</div>
+<p>Beispiele Transformation der Regressionstabelle auf Vorhersagen (Response):</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb168"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb168-1"><a href="#cb168-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plogis</span>(<span class="fl">1.47</span>) <span class="co"># Männer</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.8130574</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb170"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb170-1"><a href="#cb170-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plogis</span>(<span class="fl">1.47-1.17</span>) <span class="co"># Frauen</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.5744425</code></pre>
+</div>
+</div>
+<p>Visualisierung:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb172"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb172-1"><a href="#cb172-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(effects)</span>
+<span id="cb172-2"><a href="#cb172-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">allEffects</span>(fit))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-59-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Multiples GLM</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb173"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb173-1"><a href="#cb173-1" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">glm</span>(Vegetarier <span class="sc">~</span> Geschlecht <span class="sc">+</span> Körpergewicht, </span>
+<span id="cb173-2"><a href="#cb173-2" aria-hidden="true" tabindex="-1"></a>           <span class="at">family =</span> <span class="st">"binomial"</span>,</span>
+<span id="cb173-3"><a href="#cb173-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">data =</span> daten)</span>
+<span id="cb173-4"><a href="#cb173-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+glm(formula = Vegetarier ~ Geschlecht + Körpergewicht, family = "binomial", 
+    data = daten)
+
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-1.8423  -1.2414   0.6469   1.1073   1.1188  
+
+Coefficients:
+                   Estimate Std. Error z value Pr(&gt;|z|)
+(Intercept)         1.27413    2.81949   0.452    0.651
+GeschlechtWeiblich -1.25958    0.96350  -1.307    0.191
+Körpergewicht       0.00245    0.03504   0.070    0.944
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 88.503  on 65  degrees of freedom
+Residual deviance: 84.432  on 63  degrees of freedom
+  (4 observations deleted due to missingness)
+AIC: 90.432
+
+Number of Fisher Scoring iterations: 4</code></pre>
+</div>
+</div>
+<p>Visualisierung:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb175"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb175-1"><a href="#cb175-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(effects)</span>
+<span id="cb175-2"><a href="#cb175-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">allEffects</span>(fit))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-61-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      let href = ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

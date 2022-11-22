@@ -1,0 +1,591 @@
+---
+title: "R Code der Vorlesung BSc Statistik und Bioinformatik"
+author: "Florian Hartig"
+abstract: "Dieses Dokument fasst den in der Vorlesung live vorgeführten R Code zusammen. Das pdf wird im Laufe der Vorlesung ergänzt. Wichtig: es handelt sich hier um eine Sammlung von Code, nicht um ein Lehrbuch. Insbesondere kann dieses Dokument die in der Vorlesung gegebene mündliche Erklärung der Motivation / Outputs nicht ersetzen. Bezüglich letztere verweise ich auf Ihre Mitschriften, die Vorlesungsunterlagen und das Skript."
+format: 
+  html:
+    toc: true
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, echo=F}
+set.seed(123)
+```
+
+
+# Woche 1 - Univariate deskriptive Statistik
+
+## Einführung R
+
+```{r}
+2+2
+sqrt(3)
+(2+2)*2
+
+x = 5
+
+var1 = c(1,2,3,4)
+
+mean(var1)
+sd(var1)
+
+# Das ist ein Kommentar
+
+quantile(var1)
+
+var2 = factor(c("rot", "gelb", "gruen", "blau"))
+
+class(var1)
+class(var2)
+
+dat = data.frame(var1 = var1, var2 = var2)
+
+# Zugriff über $
+dat$var1
+```
+
+## Ihre Daten
+
+Für des Einlesen der echten Daten
+
+```{r}
+daten <- read.csv("../Daten/Biostatistik Umfrage 2022.csv", stringsAsFactors = T, na.strings = c(""))
+daten$Zeitstempel = NULL
+colnames(daten) = c("Einwohner", "Distanz", "Körpergröße", "Körpergewicht", "Geschlecht", "Händigkeit", "Wohnform", "Verkehrsmittel",  "Getränk", "Vegetarier","Studium", "CO2_Steuer", "Parkplatzgebühr", "Atomkraftwerke", "CRISPR-Cas")
+```
+
+Code für das Einlesen der randomisierten Daten, die als csv File auf GRIPS verfügbar sind (natürlich müssten Sie den Pfad so anpassen, dass es für Ihren Computer passt).
+
+```{r,eval=FALSE}
+daten = read.csv(file = "./Biostatistik Umfrage 2022 Randomisiert.csv")
+```
+
+Verkehrsmittel
+
+```{r}
+x = table(daten$Verkehrsmittel)
+barplot(x)
+pie(x)
+```
+
+Getränk
+
+```{r}
+x = table(daten$Getränk)
+x
+barplot(x)
+pie(x)
+```
+
+Wohnform
+
+```{r}
+x = table(daten$Wohnform)
+x
+par(mar = c(4,15,4,4))
+barplot(x, las = 2, horiz = T)
+```
+
+Andere nominale Variablen
+
+```{r}
+table(daten$Händigkeit)
+table(daten$Vegetarier)
+table(daten$Geschlecht)
+```
+
+Distanz
+
+```{r}
+hist(daten$Distanz, breaks = 20)
+mean(daten$Distanz)
+median(daten$Distanz)
+sd(daten$Distanz)
+quantile(daten$Distanz)
+var(daten$Distanz)
+```
+
+Körpergröße
+
+```{r}
+hist(daten$Körpergröße, breaks = 20)
+mean(daten$Körpergröße)
+median(daten$Körpergröße)
+quantile(daten$Körpergröße[daten$Geschlecht == "Weiblich"])
+boxplot(daten$Körpergröße)
+```
+
+# Woche 2 - Korrelation und Assoziation
+
+## kat \~ kat
+
+Geschlecht \~ Getränk
+
+```{r}
+x = table(daten$Geschlecht, daten$Getränk)
+barplot(x, beside = T, las = 2)
+mosaicplot(x)
+```
+
+Vegetarier \~ Geschlecht
+
+```{r}
+x = table(daten$Vegetarier, daten$Geschlecht)
+barplot(x, beside = T, las = 2)
+mosaicplot(t(x))
+```
+
+## kat \~ num
+
+Körpergröße\~Vegetarier
+
+```{r}
+boxplot(Körpergröße~Vegetarier, data = daten, notch = T)
+```
+
+CO2_Steuer\~Geschlecht + Vegetarier
+
+```{r}
+boxplot(CO2_Steuer~Geschlecht + Vegetarier, data = daten, notch = T, las = 2)
+```
+
+## num \~ num
+
+Körpergewicht \~ Körpergröße
+
+```{r}
+plot(Körpergewicht ~ Körpergröße, data = daten)
+
+cor(daten$Körpergröße, daten$Körpergewicht, use = "complete.obs")
+cor.test(daten$Körpergröße, daten$Körpergewicht, use = "complete.obs")
+cor(daten$Körpergröße, daten$Körpergewicht, use = "complete.obs", method = "spearman")
+```
+
+log(Einwohner) \~ Distanz
+
+```{r}
+plot(log(Einwohner) ~ Distanz, data = daten)
+
+cor(log(daten$Einwohner), daten$Distanz)
+cor(log(daten$Einwohner), daten$Distanz, method = "spearman" )
+```
+
+# Woche 3 - Hypothesentests
+
+### Kategorisch + kategorisch
+
+#### Vegetarier und Verkehrsmittel
+
+**Frage:** Gibt es einen signifikanten Unterschied zwischen den Verhältnissen von Vegetarier zu nicht-Vegetarier in ihrer Wahl der Verkehrsmittel?
+
+```{r}
+x = table(daten$Vegetarier, daten$Verkehrsmittel)
+print(x)
+```
+
+Visualisierung via boxplot/barplot:
+
+```{r}
+barplot(x, beside = T)
+```
+
+**Test:** prop.test
+
+**H0:** Gleiche Verhältnisse (Veg/Non-Veg) in mehreren Gruppen (Verkehrsmittel).
+
+```{r}
+prop.test(t(x))
+```
+
+p-value = 0.7936 und damit größer als unser Signifikanzniveau $\alpha$ = 0.05 und wir lehnen die H0 nicht ab, d.h. die Unterschiede zwischen den verschiedenen Verhältnissen ist nicht signifikant
+
+#### Geschlecht und Vegetarier
+
+**Frage:** Gibt es einen signifikanten Unterschied zwischen den Verhältnissen von Vegetarier zu nicht-Vegetarier in Abhaengigkeit des Geschlechtes?
+
+```{r}
+x = table(daten$Geschlecht, daten$Vegetarier)
+print(x)
+```
+
+Visualisierung via boxplot/barplot:
+
+```{r}
+barplot(x, beside = T, las = 2)
+```
+
+**Test:** prop.test
+
+**H0:** Gleiche Verhältnisse (Veg/Non-Veg) in mehreren Gruppen (Geschlecht-W, Geschlecht-M).
+
+```{r}
+prop.test(x)
+```
+
+p-value = 0.359 und damit größer als unser Signifikanzniveau $\alpha$ = 0.05 und wir lehnen die H0 nicht ab, d.h. die Unterschiede zwischen den verschiedenen Verhältnissen ist nicht signifikant
+
+### Kategorisch + Numerisch
+
+#### Körpergröße \~ Geschlecht
+
+**Frage:** Gibt es einen signifikanten Unterschied in der Körpergröße in Abhängigkeit des Geschlechtes?
+
+Visualisierung via boxplot
+
+```{r}
+boxplot(Körpergröße ~ Geschlecht, data = daten, col = "lightgrey")
+
+```
+
+::: callout-warning
+Wir können von einem normalen Boxplot nicht ablesen, ob der Unterschied signifikant ist! Wieso? Es fehlen essenzielle Informationen wie die Standardabweichung/Varianz der Mittelwerte!
+:::
+
+**Test:** t-Test
+
+Bevor wir den t-Test jedoch anwenden können, müssen wir erst prüfen ob die Normalverteilungsannahme der Körpergrößen in den zwei Geschlechtskategorieren erfüllt ist.
+
+##### Shapiro-Wilk test
+
+Shapiro-Wilk testet auf Normalverteilung, d.h. die **H0 ist dass die Daten normalverteilt sind.** Ist der shapiro test signifikant, lehnen wir die H0 ab und akzeptieren die alternativ Hypothese dass die Daten nicht normalverteilt sind:
+
+```{r}
+shapiro.test(daten$Körpergröße[daten$Geschlecht == "Weiblich"])
+shapiro.test(daten$Körpergröße[daten$Geschlecht == "Männlich"])
+```
+
+p-values $>0.05$ und damit lehnen wir H0 nicht ab, gehen von Normalverteilungen aus und können den t-test anwenden
+
+##### T-test
+
+**H0:** Kein Unterschied in den Mittelwerten, d.h. gleiche Körpergrößen
+
+```{r}
+?t.test
+t.test(Körpergröße ~ Geschlecht, data = daten)
+
+```
+
+Der p-value entspricht 0.1526 und ist damit $>0.05$. Wir lehnen deshalb die H0 nicht ab und unsere Aussage ist "Der Unterschied in den Körpergrößen von und weiblichen Studierenden war nicht signifikant (t-test, p = 0.1526)"
+
+::: callout-important
+Nur weil ein Effekt nicht signifikant ist, heißt das nicht, dass es keinen Effekt gibt! Denken Sie an die Vorlesung! Das heißt es wäre falsch etwas wie "es gibt keinen Unterschied zwischen männlichen und weiblichen Studierenden zu schreiben", der Unterschied beträgt `r 171.55-168.56` ist aber statistisch nicht signifikant.
+:::
+
+#### Körpergröße \~ Händigkeit
+
+**Frage:** Gibt es einen signifikanten Unterschied in der Körpergröße in Abhaengigkeit der Händigkeit?
+
+::: callout-tip
+Mit \`library('Name-der-library') können wir zusätzliche Funktionen laden (ähnlich wie wenn sie in einem Betriebssystem eine zusätzliche Software öffnen und verwenden).
+:::
+
+Visualisierung:
+
+```{r}
+library(beeswarm)
+boxplot(Körpergröße ~ Händigkeit, data = daten, notch = T, col = "lightgrey")
+beeswarm(Körpergröße ~ Händigkeit, data = daten, add = T, pwcol = daten$Geschlecht)
+
+```
+
+**H0:** Kein Unterschied.
+
+```{r}
+t.test(Körpergröße ~ Händigkeit, data = daten)
+```
+
+und damit signifikant, d.h. wir lehnen die H0 ab und wir schreiben "Der Unterschied in der Körpergröße von Linkshändern und Rechtshändern ist signifikant (t-test, p=5.99E-06)"
+
+::: callout-tip
+p-Wert würde kleiner wenn man ein-seitig testet, sollte man aber nur a priori und nicht auf Grundlage der Plots machen, weil letzteres verdecktes multiples Testen ist
+
+```{r}
+t.test(Körpergröße ~ Händigkeit, data = daten, alternative = "less")
+```
+:::
+
+### Numerisch+Numerisch
+
+#### Körpergröße \~ Einwohner
+
+Visualisierung via scatterplot:
+
+```{r}
+plot(Körpergröße ~ Einwohner, data =daten)
+```
+
+Berechnen wir den Pearson Korrelationsfaktor:
+
+```{r}
+cor(daten$Einwohner, daten$Körpergröße, use = "complete.obs")
+```
+
+Schwache Korrelation, ist sie signifikant? Wir können die `cor.test` hernehmen um einen Korrelationstest zu berechnen (H0: Korrelation = 0):
+
+```{r}
+cor.test(daten$Einwohner, daten$Körpergröße, use = "complete.obs")
+```
+
+p-value ist $>$ 0.05 und damit ist die Korrelation nicht signifikant.
+
+::: callout-note
+Ein kleiner Ausblick auf die kommenden Wochen: wir koennen die sogenannte lineare Regression ( $y = mx + t$ ) dazu nutzen um die Assoziation von Koerpergrosse \~ Einwohner durch eine Gerade darzustellen. D.h. in der linearen Regression werden die zwei Parameter $m$ (Steigung) und $t$ (Achsenabschnitt) geschätzt:
+
+```{r}
+fit <- lm(Körpergröße ~ Einwohner, data =daten)
+plot(Körpergröße ~ Einwohner, data =daten)
+abline(fit, col = "red", lwd = 2)
+```
+:::
+
+## Statistische power
+
+Die Power wird zum Beispiel von der standardabweichung/varianz der Daten beeinflusst:
+
+```{r}
+sd(daten$Körpergröße)
+```
+
+nehme vereinfacht an, dass 4 Beobachten je Gruppe gab. Ungleiche Gruppen hat die Funktion leider nicht. Wie viel n bräuchten wir bei der gegeben Streuung, um für einen Effekt von delta = 2 eine Power von 80% zu erreichen?
+
+```{r}
+power.t.test(delta = 2, sd = 8, power = 0.8)
+```
+
+delta = wahre Unterschied der Gruppen
+
+# Woche 4 - MLE und Regression
+
+## num + num
+
+### Körpergewicht \~ Körpergröße
+
+```{r}
+plot(daten$Körpergröße, daten$Körpergewicht)
+
+cor.test(daten$Körpergewicht, daten$Körpergröße, 
+    use = "complete.obs", method = "spearman")
+```
+
+Lineare Regression
+
+```{r}
+fit <- lm(Körpergewicht ~ Körpergröße, data = daten)
+summary(fit)
+```
+
+Visualisierung
+
+```{r}
+plot(daten$Körpergröße, daten$Körpergewicht)
+abline(fit, col = "red")
+```
+
+alternative Visualisierung
+
+```{r}
+library(effects)
+plot(allEffects(fit, partial.residuals = T))
+```
+
+### Körpergewicht \~ Einwohner
+
+```{r}
+plot(daten$Einwohner, daten$Körpergewicht)
+```
+
+```{r}
+fit <- lm(Körpergewicht ~ Einwohner, data = daten)
+summary(fit)
+```
+
+```{r}
+library(effects)
+plot(allEffects(fit, partial.residuals = T))
+```
+
+## num + kat
+
+```{r}
+boxplot(Körpergewicht ~ Geschlecht, data = daten, notch = T)
+
+fit <- lm(Körpergewicht ~ Geschlecht, data = daten)
+summary(fit)
+```
+
+```{r}
+library(effects)
+plot(allEffects(fit, partial.residuals = T))
+```
+
+```{r}
+boxplot(Körpergewicht ~ Verkehrsmittel, data = daten, notch = T)
+fit <- lm(Körpergewicht ~ Verkehrsmittel, data = daten)
+summary(fit)
+```
+
+ANOVA
+
+```{r}
+summary(aov(fit))
+```
+
+# Woche 5 - Multiple Regression
+
+## Dienstag
+
+Beispiel multiple Regression
+
+```{r}
+fit <- lm(Ozone ~ Temp + Wind, data = airquality)
+summary(fit)
+
+```
+
+Vergleich einfache Regression
+
+```{r}
+fit <- lm(Ozone ~ Temp , data = airquality)
+summary(fit)
+```
+
+Die Unterschiede in den Effektschätzern entstehen durch die Kollinearität zwischen Wind und Temperatur
+
+```{r}
+plot(Temp ~ Wind, data = airquality)
+
+
+
+```
+
+## Donnerstag
+
+### Beispiel LRT
+
+```{r}
+ratios = rep(NA, 1000)
+for(i in 1:1000){
+  # erzeuge Daten ohne Abhängigkeit
+  x = rnorm(100)
+  y = rnorm(100)
+  # vergleiche Log Likelihood M1 = y ~ x , M0 = y ~ 1
+  ratios[i] = logLik(lm(y ~ x))  - logLik(lm(y ~ 1))
+}
+
+hist(ratios, breaks = 100)
+
+```
+
+### Analyse Ihrer Daten
+
+### Körpergewicht \~ Vegetarier
+
+Einfache Regression
+
+```{r}
+plot(Körpergewicht ~ Vegetarier, data =daten, col = "lightgrey", notch = T)
+fit <- lm(Körpergewicht ~ Vegetarier, data =daten)
+summary(fit)
+```
+
+Könnte Scheinkorrelation sein wegen Vegetarier \~ Geschlecht, deshalb multiple Regression
+
+```{r}
+fit <- lm(Körpergewicht ~ Vegetarier + Geschlecht, data =daten)
+summary(fit)
+```
+
+### Körpergewicht \~ Verkehrsmittel
+
+```{r}
+boxplot(Körpergewicht ~ Verkehrsmittel, data =daten)
+fit <- lm(Körpergewicht ~ Verkehrsmittel, data =daten)
+summary(fit)
+
+```
+
+Auch hier haben wir nach Diskussion in der Klasse überlegt, ob dies eine Scheinkorrelation sein könnte, wegen Verkehrsmittel \~ Geschlecht, ev. Distanz.
+
+Multiple Regression und Kreuztabelle bestätigt das
+
+```{r}
+fit <- lm(Körpergewicht ~ Verkehrsmittel + Geschlecht + Distanz, data =daten)
+summary(fit)
+
+table(daten$Geschlecht, daten$Verkehrsmittel)
+```
+
+Final noch ein Beispiel für die Modellselektion - Geschlecht wird selektiert, eine zufällige Variable nicht.
+
+```{r}
+daten$random = rnorm(nrow(daten))
+
+M0 <- lm(Körpergewicht ~ Verkehrsmittel, data =daten)
+M1 <- lm(Körpergewicht ~ Verkehrsmittel + Geschlecht , data =daten)
+M2 <- lm(Körpergewicht ~ Verkehrsmittel + random , data =daten)
+
+summary(aov(M2))
+
+AIC(M0)
+AIC(M1)
+AIC(M2)
+```
+
+# Woche 6 - GLM
+
+## Dienstag
+
+Interessieren uns für die Assoziazion Veg \~ Geschlecht. Erinnerung: deskriptiv über Kreuztabelle + gruppiertes Balkendiagram
+
+```{r}
+x = table(daten$Vegetarier, daten$Geschlecht)
+x
+barplot(x, beside = T)
+```
+
+Könnten einen Hypothesentest machen
+
+```{r}
+prop.test(x)
+```
+
+Aber regression ist allgeiner. Abhängige Variable ist 0/1, deshalb logische Regression:
+
+```{r}
+fit <- glm(Vegetarier ~ Geschlecht, 
+           family = "binomial",
+           data = daten)
+summary(fit)
+```
+
+Beispiele Transformation der Regressionstabelle auf Vorhersagen (Response):
+
+```{r}
+plogis(1.47) # Männer
+plogis(1.47-1.17) # Frauen
+```
+
+Visualisierung:
+
+```{r}
+library(effects)
+plot(allEffects(fit))
+```
+
+Multiples GLM
+
+```{r}
+fit <- glm(Vegetarier ~ Geschlecht + Körpergewicht, 
+           family = "binomial",
+           data = daten)
+summary(fit)
+```
+
+Visualisierung:
+
+```{r}
+library(effects)
+plot(allEffects(fit))
+```

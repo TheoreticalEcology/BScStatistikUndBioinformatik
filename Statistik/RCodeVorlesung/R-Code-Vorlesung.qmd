@@ -13,7 +13,6 @@ editor_options:
 set.seed(123)
 ```
 
-
 # Woche 1 - Univariate deskriptive Statistik
 
 ## Einführung R
@@ -59,10 +58,10 @@ daten$Zeitstempel = NULL
 colnames(daten) = c("Einwohner", "Distanz", "Körpergröße", "Körpergewicht", "Geschlecht", "Händigkeit", "Verkehrsmittel",  "Getränk", "Vegetarier","Studium", "Zukunft", "CO2Steuer", "Parkgebuehr")
 summary(daten)
 
+set.seed(123)
 daten <- missRanger::missRanger(daten, pmm.k = 3, verbose = 0)
 summary(daten)
 ```
-
 
 Code für das Einlesen der randomisierten Daten, die als csv File auf GRIPS verfügbar sind (natürlich müssten Sie den Pfad so anpassen, dass es für Ihren Computer passt).
 
@@ -71,7 +70,6 @@ daten = read.csv(file = "./Biostatistik Umfrage 2023 Randomisiert.csv")
 ```
 
 ## Kategorisch ungeordnet
-
 
 ```{r}
 x = table(daten$Getränk)
@@ -148,7 +146,6 @@ barplot(x)
 
 ## kat \~ kat
 
-
 ```{r}
 x = table(daten$Geschlecht, daten$Vegetarier)
 x
@@ -174,7 +171,6 @@ mosaicplot(x)
 
 ```
 
-
 ## kat \~ num
 
 ```{r}
@@ -188,10 +184,7 @@ boxplot(CO2Steuer ~ Verkehrsmittel, data = daten)
 boxplot(Parkgebuehr ~ Verkehrsmittel, data = daten)
 ```
 
-
 ## num \~ num
-
-
 
 ```{r}
 plot(daten$Körpergröße, daten$Körpergewicht)
@@ -223,6 +216,408 @@ cor(rnorm(80), rnorm(80), method = "spearman")
 cor.test(log10(daten$Einwohner+1), daten$Körpergewicht, method = "spearman")
 ```
 
+# Woche 3 - Hypothesentests
 
+## Tests Kategorisch + kategorisch
 
+### Vegetarier und Verkehrsmittel
 
+**Frage:** Gibt es einen signifikanten Unterschied zwischen den Verhältnissen von Vegetarier zu nicht-Vegetarier in ihrer Wahl der Verkehrsmittel?
+
+```{r}
+x = table(daten$Vegetarier, daten$Verkehrsmittel)
+print(x)
+```
+
+Visualisierung via boxplot/barplot:
+
+```{r}
+barplot(x, beside = T)
+```
+
+**Test:** prop.test
+
+**H0:** Gleiche Verhältnisse (Veg/Non-Veg) in mehreren Gruppen (Verkehrsmittel).
+
+```{r}
+prop.test(t(x))
+```
+
+### Geschlecht und Vegetarier
+
+**Frage:** Gibt es einen signifikanten Unterschied zwischen den Verhältnissen von Vegetarier zu nicht-Vegetarier in Abhaengigkeit des Geschlechtes?
+
+```{r}
+x = table(daten$Geschlecht, daten$Vegetarier)
+print(x)
+```
+
+Visualisierung via boxplot/barplot:
+
+```{r}
+barplot(x, beside = T, las = 2)
+```
+
+**Test:** prop.test
+
+**H0:** Gleiche Verhältnisse (Veg/Non-Veg) in mehreren Gruppen (Geschlecht-W, Geschlecht-M).
+
+```{r}
+prop.test(x)
+```
+
+## Test Kategorisch + Numerisch
+
+### Körpergröße \~ Geschlecht
+
+**Frage:** Gibt es einen signifikanten Unterschied in der Körpergröße in Abhängigkeit des Geschlechtes?
+
+Visualisierung via boxplot
+
+```{r}
+boxplot(Körpergröße ~ Geschlecht, data = daten, col = "lightgrey")
+
+```
+
+::: callout-warning
+Wir können von einem normalen Boxplot nicht ablesen, ob der Unterschied signifikant ist! Wieso? Es fehlen essenzielle Informationen wie die Menge an Daten, die den Standardfehler des Mittelwerts beinflussen! Ein Notch Plot wäre hier schon besser, aber das letzte Wort hat ein formaler Test.
+:::
+
+**Test:** t-Test
+
+Bevor wir den t-Test jedoch anwenden können, müssen wir erst prüfen ob die Normalverteilungsannahme der Körpergrößen in den zwei Geschlechtskategorieren erfüllt ist.
+
+#### Shapiro-Wilk test
+
+Shapiro-Wilk testet auf Normalverteilung, d.h. die **H0 ist dass die Daten normalverteilt sind.** Ist der shapiro test signifikant, lehnen wir die H0 ab und akzeptieren die alternativ Hypothese dass die Daten nicht normalverteilt sind:
+
+```{r}
+shapiro.test(daten$Körpergröße[daten$Geschlecht == "Weiblich"])
+shapiro.test(daten$Körpergröße[daten$Geschlecht == "Männlich"])
+```
+
+Falls einer der p-Werte \< 0.05 so haben wir Evidenz gegen eine Normalverteilung und sollten statt des t-tests den Mann-Whitney U Test nehmen
+
+#### T-test und Mann-Whitney U Test
+
+**H0:** Kein Unterschied in den Mittelwerten, d.h. gleiche Körpergrößen
+
+```{r}
+?t.test
+t.test(Körpergröße ~ Geschlecht, data = daten)
+
+```
+
+Etwas verwirrend wird der Mann-Whitney U Test mit der R Funktion "wilcox.test" aufgerufen
+
+```{r}
+wilcox.test(Körpergröße ~ Geschlecht, data = daten)
+```
+
+::: callout-important
+Nur weil ein Effekt nicht signifikant ist, heißt das nicht, dass es keinen Effekt gibt! Denken Sie an die Vorlesung! Das heißt es wäre falsch etwas wie "es gibt keinen Unterschied zwischen männlichen und weiblichen Studierenden zu schreiben", schreiben Sie einfach "der Unterschied ist statistisch nicht signifikant".
+:::
+
+### Körpergröße \~ Händigkeit
+
+**Frage:** Gibt es einen signifikanten Unterschied in der Körpergröße in Abhaengigkeit der Händigkeit?
+
+Zur Abwechslung mache ich diesmal eine andere Visualisierung der Daten: ein Notchplot mit einem Beehive Plot überlagert. Der Vorteil dieser Visualisierung ist, dass man die Einfachheit des Boxplots hat, aber auch jeden einzelnen Datenpunkt sehen kann.
+
+::: callout-tip
+Hier verwende ich den Befehl `library(beeswarm)`. Mit \`library('Name-der-library') können wir zusätzliche Funktionen laden (ähnlich wie wenn sie in einem Betriebssystem eine zusätzliche Software öffnen und verwenden).
+:::
+
+Visualisierung:
+
+```{r, warning=F}
+library(beeswarm)
+boxplot(Körpergröße ~ Händigkeit, data = daten, notch = T, col = "lightgrey")
+beeswarm(Körpergröße ~ Händigkeit, data = daten, add = T, pwcol = daten$Geschlecht)
+
+```
+
+**H0:** Kein Unterschied.
+
+```{r}
+t.test(Körpergröße ~ Händigkeit, data = daten)
+```
+
+::: callout-tip
+Der p-Wert könnte kleiner werden, wenn man einseitig testet. Dies sollte man aber nur a priori und nicht auf Grundlage der Plots machen, weil letzteres verdecktes multiples Testen ist.
+
+```{r}
+t.test(Körpergröße ~ Händigkeit, data = daten, alternative = "less") # linksseitig
+t.test(Körpergröße ~ Händigkeit, data = daten, alternative = "greater") # rechtsseitig
+```
+:::
+
+## Test Numerisch+Numerisch
+
+### Körpergröße \~ Einwohner
+
+Visualisierung via scatterplot:
+
+```{r}
+plot(Körpergröße ~ Einwohner, data =daten)
+```
+
+Berechnen wir den Pearson Korrelationsfaktor:
+
+```{r}
+cor(daten$Einwohner, daten$Körpergröße, use = "complete.obs")
+```
+
+Schwache Korrelation, ist sie signifikant? Wir können die `cor.test` hernehmen um einen Korrelationstest zu berechnen (H0: Korrelation = 0):
+
+```{r}
+cor.test(daten$Einwohner, daten$Körpergröße, use = "complete.obs")
+```
+
+::: callout-note
+Ein kleiner Ausblick auf die kommenden Wochen: wir koennen die sogenannte lineare Regression ( $y = mx + t$ ) dazu nutzen um die Assoziation von Koerpergrosse \~ Einwohner durch eine Gerade darzustellen. D.h. in der linearen Regression werden die zwei Parameter $m$ (Steigung) und $t$ (Achsenabschnitt) geschätzt:
+
+```{r}
+fit <- lm(Körpergröße ~ Einwohner, data =daten)
+plot(Körpergröße ~ Einwohner, data =daten)
+abline(fit, col = "red", lwd = 2)
+```
+:::
+
+## Statistische power
+
+Die Power wird zum Beispiel von der Standardabweichung / Varianz der Daten beeinflusst:
+
+```{r}
+sd(daten$Körpergröße)
+```
+
+nehme vereinfacht an, dass 4 Beobachten je Gruppe gab. Ungleiche Gruppen hat die Funktion leider nicht. Wie viel n bräuchten wir bei der gegeben Streuung, um für einen Effekt von delta = 2 eine Power von 80% zu erreichen?
+
+```{r}
+power.t.test(delta = 2, sd = 8, power = 0.8)
+```
+
+delta = wahre Unterschied der Gruppen
+
+## Hypothesentest selbst gebaut
+
+Die Tests bis jetzt haben alle eine mathematische Funktion benutzt, um dem p-Wert auszurechnen. Wenn es eine solche Funktion gibt ist dies normalerweise vorteilhaft weil schneller.
+
+Wir können uns aber auch ganz einfach ohne Mathematik einen sogenannten nichtparametrischen Test selbst programmieren. Die Idee hier ist: wir randomisieren einfach die Daten viele Male und rechnen jeweils die Teststatistik aus. Hierdurch erhalten wir die Nullverteilung, aus der wir dann den p-Wert berechnen können. Hier am Beispiel der Korrelation
+
+```{r}
+x1 = daten$Körpergröße
+x2 = daten$Körpergewicht
+
+getNullValue <- function(){
+  x1Random = sample(x1, size = length(x1))
+  x2Random = sample(x2, size = length(x2))
+  return(cor(x1Random, x2Random))
+}
+
+getNullValue()
+
+nullDistribution = replicate(10000, getNullValue())
+
+hist(nullDistribution)
+
+obsCor = cor(x1, x2)
+
+abline(v = obsCor, col = "red")
+
+# linksseitig
+mean(nullDistribution <= obsCor)
+mean(nullDistribution >= obsCor)
+
+0.0031 *2
+```
+
+Das Ergebnis ist praktisch identisch mit cor.test
+
+```{r}
+cor.test(x1,x2)
+```
+
+# Woche 4 - MLE und Regression
+
+## num + num
+
+### Körpergewicht \~ Körpergröße
+
+```{r}
+plot(daten$Körpergröße, daten$Körpergewicht)
+
+cor.test(daten$Körpergewicht, daten$Körpergröße, 
+    use = "complete.obs", method = "spearman")
+```
+
+Lineare Regression
+
+```{r}
+fit <- lm(Körpergewicht ~ Körpergröße, data = daten)
+summary(fit)
+```
+
+Visualisierung
+
+```{r}
+plot(daten$Körpergröße, daten$Körpergewicht)
+abline(fit, col = "red")
+```
+
+alternative Visualisierung
+
+```{r}
+library(effects)
+plot(allEffects(fit, partial.residuals = T))
+```
+
+### Körpergewicht \~ Einwohner
+
+```{r}
+plot(daten$Einwohner, daten$Körpergewicht)
+```
+
+```{r}
+fit <- lm(Körpergewicht ~ Einwohner, data = daten)
+summary(fit)
+```
+
+```{r}
+library(effects)
+plot(allEffects(fit, partial.residuals = T))
+```
+
+## num + kat
+
+```{r}
+boxplot(Körpergewicht ~ Geschlecht, data = daten, notch = T)
+
+fit <- lm(Körpergewicht ~ Geschlecht, data = daten)
+summary(fit)
+```
+
+```{r}
+library(effects)
+plot(allEffects(fit, partial.residuals = T))
+```
+
+```{r}
+boxplot(Körpergewicht ~ Verkehrsmittel, data = daten, notch = T)
+fit <- lm(Körpergewicht ~ Verkehrsmittel, data = daten)
+summary(fit)
+```
+
+ANOVA
+
+```{r}
+summary(aov(fit))
+```
+
+# Woche 5 - Multiple Regression
+
+## Dienstag
+
+Beispiel multiple Regression
+
+```{r}
+fit <- lm(Ozone ~ Temp + Wind, data = airquality)
+summary(fit)
+
+```
+
+Vergleich einfache Regression
+
+```{r}
+fit <- lm(Ozone ~ Temp , data = airquality)
+summary(fit)
+```
+
+Die Unterschiede in den Effektschätzern entstehen durch die Kollinearität zwischen Wind und Temperatur
+
+```{r}
+plot(Temp ~ Wind, data = airquality)
+```
+
+## Donnerstag
+
+### Beispiel LRT
+
+```{r}
+ratios = rep(NA, 1000)
+for(i in 1:1000){
+  # erzeuge Daten ohne Abhängigkeit
+  x = rnorm(100)
+  y = rnorm(100)
+  # vergleiche Log Likelihood M1 = y ~ x , M0 = y ~ 1
+  ratios[i] = logLik(lm(y ~ x))  - logLik(lm(y ~ 1))
+}
+
+hist(ratios, breaks = 100)
+
+```
+
+### Analyse Ihrer Daten
+
+### Körpergewicht \~ Vegetarier
+
+Einfache Regression
+
+```{r}
+plot(Körpergewicht ~ Vegetarier, data =daten, col = "lightgrey", notch = T)
+fit <- lm(Körpergewicht ~ Vegetarier, data =daten)
+summary(fit)
+```
+
+Könnte Scheinkorrelation sein wegen Vegetarier \~ Geschlecht, deshalb multiple Regression
+
+```{r}
+fit <- lm(Körpergewicht ~ Vegetarier + Geschlecht, data =daten)
+summary(fit)
+```
+
+### Körpergewicht \~ Verkehrsmittel
+
+```{r}
+boxplot(Körpergewicht ~ Verkehrsmittel, data =daten)
+fit <- lm(Körpergewicht ~ Verkehrsmittel, data =daten)
+summary(fit)
+
+```
+
+Auch hier haben wir nach Diskussion in der Klasse überlegt, ob dies eine Scheinkorrelation sein könnte, wegen Verkehrsmittel \~ Geschlecht, ev. Distanz.
+
+Multiple Regression und Kreuztabelle bestätigt das
+
+```{r}
+fit <- lm(Körpergewicht ~ Verkehrsmittel + Geschlecht + Distanz, data =daten)
+summary(fit)
+
+table(daten$Geschlecht, daten$Verkehrsmittel)
+```
+
+Final noch ein Beispiel für die Modellselektion - Geschlecht wird selektiert, eine zufällige Variable nicht.
+
+```{r}
+daten$random = rnorm(nrow(daten))
+
+M0 <- lm(Körpergewicht ~ Verkehrsmittel, data =daten)
+M1 <- lm(Körpergewicht ~ Verkehrsmittel + Geschlecht , data =daten)
+M2 <- lm(Körpergewicht ~ Verkehrsmittel + random , data =daten)
+
+```
+
+Selektion der Modelle über LRTs / ANOVA
+
+```{r}
+summary(aov(M2))
+```
+
+Selektion der Modelle über AIC
+
+```{r}
+AIC(M0)
+AIC(M1)
+AIC(M2)
+```

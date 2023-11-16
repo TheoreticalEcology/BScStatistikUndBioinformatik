@@ -621,3 +621,5 @@ AIC(M0)
 AIC(M1)
 AIC(M2)
 ```
+
+\# Woche 6 - GLM

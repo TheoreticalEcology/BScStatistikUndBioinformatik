@@ -622,4 +622,62 @@ AIC(M1)
 AIC(M2)
 ```
 
-\# Woche 6 - GLM
+# Woche 6 - GLM
+
+## Dienstag
+
+Interessieren uns für die Assoziazion Veg \~ Geschlecht. Erinnerung: deskriptiv über Kreuztabelle + gruppiertes Balkendiagram
+
+```{r}
+x = table(daten$Vegetarier, daten$Geschlecht)
+x
+barplot(x, beside = T)
+```
+
+Könnten einen Hypothesentest machen
+
+```{r}
+prop.test(x)
+```
+
+Aber Regression ist allgemeiner. Abhängige Variable ist 0/1, deshalb logische Regression:
+
+```{r}
+fit <- glm(Vegetarier ~ Geschlecht, 
+           family = "binomial",
+           data = daten)
+summary(fit)
+```
+
+Beispiele Transformation der Regressionstabelle auf Vorhersagen (Response):
+
+```{r}
+plogis(1.47) # Männer
+plogis(1.47-1.17) # Frauen
+```
+
+Visualisierung:
+
+```{r}
+library(effects)
+plot(allEffects(fit))
+```
+
+Multiples GLM
+
+```{r}
+fit <- glm(Vegetarier ~ Geschlecht + Körpergewicht, 
+           family = "binomial",
+           data = daten)
+summary(fit)
+```
+
+Visualisierung:
+
+```{r}
+library(effects)
+plot(allEffects(fit))
+```
+
+
+

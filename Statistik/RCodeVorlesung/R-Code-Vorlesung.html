@@ -135,6 +135,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#körpergewicht-verkehrsmittel" id="toc-körpergewicht-verkehrsmittel" class="nav-link" data-scroll-target="#körpergewicht-verkehrsmittel">Körpergewicht ~ Verkehrsmittel</a></li>
   </ul></li>
   </ul></li>
+  <li><a href="#woche-6---glm" id="toc-woche-6---glm" class="nav-link" data-scroll-target="#woche-6---glm">Woche 6 - GLM</a>
+  <ul class="collapse">
+  <li><a href="#dienstag-1" id="toc-dienstag-1" class="nav-link" data-scroll-target="#dienstag-1">Dienstag</a></li>
+  </ul></li>
   </ul>
 </nav>
 </div>
@@ -1535,8 +1539,132 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 <pre><code>[1] 620.7161</code></pre>
 </div>
 </div>
-<p># Woche 6 - GLM</p>
 </section>
+</section>
+</section>
+<section id="woche-6---glm" class="level1">
+<h1>Woche 6 - GLM</h1>
+<section id="dienstag-1" class="level2">
+<h2 class="anchored" data-anchor-id="dienstag-1">Dienstag</h2>
+<p>Interessieren uns für die Assoziazion Veg ~ Geschlecht. Erinnerung: deskriptiv über Kreuztabelle + gruppiertes Balkendiagram</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb226"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb226-1"><a href="#cb226-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">=</span> <span class="fu">table</span>(daten<span class="sc">$</span>Vegetarier, daten<span class="sc">$</span>Geschlecht)</span>
+<span id="cb226-2"><a href="#cb226-2" aria-hidden="true" tabindex="-1"></a>x</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      
+       Männlich Weiblich
+  Ja         11       22
+  Nein       20       26</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb228"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb228-1"><a href="#cb228-1" aria-hidden="true" tabindex="-1"></a><span class="fu">barplot</span>(x, <span class="at">beside =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-54-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Könnten einen Hypothesentest machen</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb229"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb229-1"><a href="#cb229-1" aria-hidden="true" tabindex="-1"></a><span class="fu">prop.test</span>(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    2-sample test for equality of proportions with continuity correction
+
+data:  x
+X-squared = 0.45853, df = 1, p-value = 0.4983
+alternative hypothesis: two.sided
+95 percent confidence interval:
+ -0.3428554  0.1399568
+sample estimates:
+   prop 1    prop 2 
+0.3333333 0.4347826 </code></pre>
+</div>
+</div>
+<p>Aber Regression ist allgemeiner. Abhängige Variable ist 0/1, deshalb logische Regression:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb231"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb231-1"><a href="#cb231-1" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">glm</span>(Vegetarier <span class="sc">~</span> Geschlecht, </span>
+<span id="cb231-2"><a href="#cb231-2" aria-hidden="true" tabindex="-1"></a>           <span class="at">family =</span> <span class="st">"binomial"</span>,</span>
+<span id="cb231-3"><a href="#cb231-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">data =</span> daten)</span>
+<span id="cb231-4"><a href="#cb231-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+glm(formula = Vegetarier ~ Geschlecht, family = "binomial", data = daten)
+
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-1.4395  -1.2491   0.9362   1.1073   1.1073  
+
+Coefficients:
+                   Estimate Std. Error z value Pr(&gt;|z|)
+(Intercept)          0.5978     0.3754   1.593    0.111
+GeschlechtWeiblich  -0.4308     0.4742  -0.909    0.364
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 107.37  on 78  degrees of freedom
+Residual deviance: 106.53  on 77  degrees of freedom
+AIC: 110.53
+
+Number of Fisher Scoring iterations: 4</code></pre>
+</div>
+</div>
+<p>Beispiele Transformation der Regressionstabelle auf Vorhersagen (Response):</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb233"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb233-1"><a href="#cb233-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plogis</span>(<span class="fl">1.47</span>) <span class="co"># Männer</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.8130574</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb235"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb235-1"><a href="#cb235-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plogis</span>(<span class="fl">1.47-1.17</span>) <span class="co"># Frauen</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.5744425</code></pre>
+</div>
+</div>
+<p>Visualisierung:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb237"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb237-1"><a href="#cb237-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(effects)</span>
+<span id="cb237-2"><a href="#cb237-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">allEffects</span>(fit))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-58-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Multiples GLM</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb238"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb238-1"><a href="#cb238-1" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">glm</span>(Vegetarier <span class="sc">~</span> Geschlecht <span class="sc">+</span> Körpergewicht, </span>
+<span id="cb238-2"><a href="#cb238-2" aria-hidden="true" tabindex="-1"></a>           <span class="at">family =</span> <span class="st">"binomial"</span>,</span>
+<span id="cb238-3"><a href="#cb238-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">data =</span> daten)</span>
+<span id="cb238-4"><a href="#cb238-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+glm(formula = Vegetarier ~ Geschlecht + Körpergewicht, family = "binomial", 
+    data = daten)
+
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-1.5026  -1.2555   0.9216   1.0790   1.2686  
+
+Coefficients:
+                    Estimate Std. Error z value Pr(&gt;|z|)
+(Intercept)         1.097865   1.507875   0.728    0.467
+GeschlechtWeiblich -0.495410   0.511318  -0.969    0.333
+Körpergewicht      -0.006785   0.019784  -0.343    0.732
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 107.37  on 78  degrees of freedom
+Residual deviance: 106.41  on 76  degrees of freedom
+AIC: 112.41
+
+Number of Fisher Scoring iterations: 4</code></pre>
+</div>
+</div>
+<p>Visualisierung:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb240"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb240-1"><a href="#cb240-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(effects)</span>
+<span id="cb240-2"><a href="#cb240-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">allEffects</span>(fit))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-60-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
 </section>
 </section>
 

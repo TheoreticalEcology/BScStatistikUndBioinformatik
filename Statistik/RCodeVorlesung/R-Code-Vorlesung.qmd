@@ -1,7 +1,7 @@
 ---
 title: "R Code der Vorlesung BSc Statistik und Bioinformatik"
 author: "Florian Hartig"
-abstract: "Dieses Dokument fasst den in der Vorlesung live vorgeführten R Code zusammen. Das pdf wird im Laufe der Vorlesung ergänzt. Wichtig: es handelt sich hier um eine Sammlung von Code, nicht um ein Lehrbuch. Insbesondere kann dieses Dokument die in der Vorlesung gegebene mündliche Erklärung der Motivation / Outputs nicht ersetzen. Bezüglich letztere verweise ich auf Ihre Mitschriften, die Vorlesungsunterlagen und das Skript."
+abstract: "Dieses Dokument fasst den in der Vorlesung live vorgeführten R Code zusammen. Wichtig: es handelt sich hier um eine Sammlung von Code, nicht um ein Lehrbuch. Insbesondere kann dieses Dokument die in der Vorlesung gegebene mündliche Erklärung der Motivation / Outputs nicht ersetzen. Bezüglich letztere verweise ich auf Ihre Mitschriften, die Vorlesungsunterlagen und das Skript."
 format: 
   html:
     toc: true
@@ -19,665 +19,78 @@ set.seed(123)
 
 ```{r}
 2+2
-sqrt(3)
-(2+2)*2
+sqrt(5)
+barplot(c(1,2,3))
 
-x = 5
-
-var1 = c(1,2,3,4)
+var1 = 5
+var1 = c(1,2,3)
+var2 = factor(c("rot", "gruen", "blau"))
 
 mean(var1)
-sd(var1)
-
-# Das ist ein Kommentar
-
-quantile(var1)
-
-var2 = factor(c("rot", "gelb", "gruen", "blau"))
-
-class(var1)
-class(var2)
+mean(var2)
 
 dat = data.frame(var1 = var1, var2 = var2)
-
-# Zugriff über $
 dat$var1
+str(dat)
 
-plot(var1)
-barplot(var1)
+# das ist ein Kommentar
+# Hilfe von Funktionen über ?name oder Maus auf Funktion und F1 drücken
 ```
 
-## Ihre Daten
-
-Für des Einlesen der echten Daten
+## Zentraler Grenzwertsatz
 
 ```{r}
-daten <- read.csv("../Daten/Biostatistik Umfrage 2023.csv", stringsAsFactors = T, na.strings = c(""))
+x = rlnorm(500)
+hist(x, breaks = 50)
 
-daten$Zeitstempel = NULL
-colnames(daten) = c("Einwohner", "Distanz", "Körpergröße", "Körpergewicht", "Geschlecht", "Händigkeit", "Verkehrsmittel",  "Getränk", "Vegetarier","Studium", "Zukunft", "CO2Steuer", "Parkgebuehr")
-summary(daten)
-
-set.seed(123)
-daten <- missRanger::missRanger(daten, pmm.k = 3, verbose = 0)
-summary(daten)
+y = replicate(2000,mean(rlnorm(2000)))
+hist(y, breaks = 50)
 ```
 
-Code für das Einlesen der randomisierten Daten, die als csv File auf GRIPS verfügbar sind (natürlich müssten Sie den Pfad so anpassen, dass es für Ihren Computer passt).
+## Beispiel deskriptive Statistik mit realen Daten
 
-```{r,eval=FALSE}
-daten = read.csv(file = "./Biostatistik Umfrage 2023 Randomisiert.csv")
-```
-
-## Kategorisch ungeordnet
+Hier benutzen wir Daten der Passigierliste der Titanic. Die Daten sind im EcoData package enthalten. Um das EcoData package zu installieren, folgen Sie den Anweisungen [hier](https://theoreticalecology.github.io/AdvancedRegressionModels/1A-GettingStarted.html#libraries-that-you-will-need)
 
 ```{r}
-x = table(daten$Getränk)
-barplot(x, las = 2)
-pie(x)
+library(EcoData)
 
-x = table(daten$Verkehrsmittel)
+str(titanic)
+
+titanic$pclass = factor(titanic$pclass)
+x = table(titanic$pclass)
 x
-barplot(x, las = 2)
-
-x = table(daten$Geschlecht)
-x
-barplot(x, las = 2, col = c("red", "blue"))
-
-x = table(daten$Händigkeit)
-x
-barplot(x, las = 2)
-
-x = table(daten$Vegetarier)
-x
-barplot(x, las = 2)
-```
-
-## numerische Variablen
-
-```{r}
-hist(daten$Distanz, breaks = 100)
-hist(log10(daten$Distanz + 1), breaks = 100)
-
-mean(daten$Distanz)
-median(daten$Distanz)
-var(daten$Distanz)
-sd(daten$Distanz)
-quantile(daten$Distanz)
-boxplot(daten$Distanz, ylim = c(0,1000))
-
-x = daten$Einwohner
-summary(x)
-hist(x, breaks = 100)
-boxplot(x, ylim = c(0,1000000))
-
-x = daten$Körpergröße
-summary(x)
-hist(x, breaks = 100)
-boxplot(x)
-
-x = daten$Körpergewicht
-summary(x)
-hist(x, breaks = 100)
-boxplot(x)
-```
-
-## kategorisch geordnet / ordinal
-
-Können wir entweder kategorisch oder numerisch behandeln
-
-```{r}
-x = table(daten$Parkgebuehr)
 barplot(x)
-mean(daten$Parkgebuehr)
+barplot(x, las = 2, horiz = T, col = c("darkred"))
 
-x = table(daten$Studium)
+x = table(titanic$sex)
+x
 barplot(x)
 
-x = table(daten$Zukunft)
-barplot(x)
+hist(titanic$age)
+hist(titanic$age[titanic$pclass == 3])
 
-x = table(daten$CO2Steuer)
-barplot(x)
+mean(titanic$age, na.rm = T)
+median(titanic$age, na.rm = T)
+var(titanic$age, na.rm = T)
+sd(titanic$age, na.rm = T)
 
-```
+quantile(titanic$age, na.rm = T)
+boxplot(titanic$age)
 
-# Woche 2 - Korrelation und Assoziation
-
-## kat \~ kat
-
-```{r}
-x = table(daten$Geschlecht, daten$Vegetarier)
-x
-barplot(t(x), beside = T)
-barplot(x, beside = F)
-
-mosaicplot(x)
-
-x = table(daten$Geschlecht, daten$Getränk)
-x
-barplot(x, beside = T, las = 2)
-
-x = table(daten$Geschlecht, daten$Verkehrsmittel)
-x
-barplot(x, beside = T, las = 2)
-mosaicplot(t(x))
-
-
-x = table(daten$Geschlecht, daten$Studium)
-x
-barplot(t(x), beside = T, las = 2)
-mosaicplot(x)
+# um moments zu installieren tippen Sie install.packages("moments")
+library(moments)
+skewness(titanic$age, na.rm = T)
 
 ```
 
-## kat \~ num
+# Woche 2
 
-```{r}
-boxplot(Körpergewicht ~ Geschlecht, data = daten)
-boxplot(Körpergröße ~ Geschlecht, data = daten)
-boxplot(Körpergewicht ~ Getränk, data = daten)
-boxplot(Körpergewicht ~ Vegetarier, data = daten)
-boxplot(Körpergröße ~ Verkehrsmittel, data = daten)
+# Woche 3
 
-boxplot(CO2Steuer ~ Verkehrsmittel, data = daten)
-boxplot(Parkgebuehr ~ Verkehrsmittel, data = daten)
-```
+# Woche 4
 
-## num \~ num
+# Woche 5
 
-```{r}
-plot(daten$Körpergröße, daten$Körpergewicht)
+# Woche 6
 
-cor(daten$Körpergröße, daten$Körpergewicht)
-cor(daten$Körpergröße, daten$Körpergewicht, method = "spearman")
-
-sel = daten$Körpergröße > 150
-cor(daten$Körpergröße[sel], daten$Körpergewicht[sel])
-cor(daten$Körpergröße[sel], daten$Körpergewicht[sel], method = "spearman")
-
-
-plot(log10(daten$Einwohner+1), daten$Körpergröße)
-cor(log10(daten$Einwohner+1), daten$Körpergröße)
-cor(log10(daten$Einwohner+1), daten$Körpergröße, method = "spearman")
-
-plot(log10(daten$Einwohner+1), daten$Körpergewicht)
-cor(log10(daten$Einwohner+1), daten$Körpergewicht)
-cor(log10(daten$Einwohner+1), daten$Körpergewicht, method = "spearman")
-
-plot(daten$Einwohner, daten$Körpergewicht)
-cor(daten$Einwohner, daten$Körpergewicht)
-cor(daten$Einwohner, daten$Körpergewicht, method = "spearman")
-
-# Motivation p-Wert
-plot(log10(daten$Einwohner+1), daten$Körpergewicht)
-cor(log10(daten$Einwohner+1), daten$Körpergewicht, method = "spearman")
-cor(rnorm(80), rnorm(80), method = "spearman")
-cor.test(log10(daten$Einwohner+1), daten$Körpergewicht, method = "spearman")
-```
-
-# Woche 3 - Hypothesentests
-
-## Tests Kategorisch + kategorisch
-
-### Vegetarier und Verkehrsmittel
-
-**Frage:** Gibt es einen signifikanten Unterschied zwischen den Verhältnissen von Vegetarier zu nicht-Vegetarier in ihrer Wahl der Verkehrsmittel?
-
-```{r}
-x = table(daten$Vegetarier, daten$Verkehrsmittel)
-print(x)
-```
-
-Visualisierung via boxplot/barplot:
-
-```{r}
-barplot(x, beside = T)
-```
-
-**Test:** prop.test
-
-**H0:** Gleiche Verhältnisse (Veg/Non-Veg) in mehreren Gruppen (Verkehrsmittel).
-
-```{r}
-prop.test(t(x))
-```
-
-### Geschlecht und Vegetarier
-
-**Frage:** Gibt es einen signifikanten Unterschied zwischen den Verhältnissen von Vegetarier zu nicht-Vegetarier in Abhaengigkeit des Geschlechtes?
-
-```{r}
-x = table(daten$Geschlecht, daten$Vegetarier)
-print(x)
-```
-
-Visualisierung via boxplot/barplot:
-
-```{r}
-barplot(x, beside = T, las = 2)
-```
-
-**Test:** prop.test
-
-**H0:** Gleiche Verhältnisse (Veg/Non-Veg) in mehreren Gruppen (Geschlecht-W, Geschlecht-M).
-
-```{r}
-prop.test(x)
-```
-
-## Test Kategorisch + Numerisch
-
-### Körpergröße \~ Geschlecht
-
-**Frage:** Gibt es einen signifikanten Unterschied in der Körpergröße in Abhängigkeit des Geschlechtes?
-
-Visualisierung via boxplot
-
-```{r}
-boxplot(Körpergröße ~ Geschlecht, data = daten, col = "lightgrey")
-
-```
-
-::: callout-warning
-Wir können von einem normalen Boxplot nicht ablesen, ob der Unterschied signifikant ist! Wieso? Es fehlen essenzielle Informationen wie die Menge an Daten, die den Standardfehler des Mittelwerts beinflussen! Ein Notch Plot wäre hier schon besser, aber das letzte Wort hat ein formaler Test.
-:::
-
-**Test:** t-Test
-
-Bevor wir den t-Test jedoch anwenden können, müssen wir erst prüfen ob die Normalverteilungsannahme der Körpergrößen in den zwei Geschlechtskategorieren erfüllt ist.
-
-#### Shapiro-Wilk test
-
-Shapiro-Wilk testet auf Normalverteilung, d.h. die **H0 ist dass die Daten normalverteilt sind.** Ist der shapiro test signifikant, lehnen wir die H0 ab und akzeptieren die alternativ Hypothese dass die Daten nicht normalverteilt sind:
-
-```{r}
-shapiro.test(daten$Körpergröße[daten$Geschlecht == "Weiblich"])
-shapiro.test(daten$Körpergröße[daten$Geschlecht == "Männlich"])
-```
-
-Falls einer der p-Werte \< 0.05 so haben wir Evidenz gegen eine Normalverteilung und sollten statt des t-tests den Mann-Whitney U Test nehmen
-
-#### T-test und Mann-Whitney U Test
-
-**H0:** Kein Unterschied in den Mittelwerten, d.h. gleiche Körpergrößen
-
-```{r}
-?t.test
-t.test(Körpergröße ~ Geschlecht, data = daten)
-
-```
-
-Etwas verwirrend wird der Mann-Whitney U Test mit der R Funktion "wilcox.test" aufgerufen
-
-```{r}
-wilcox.test(Körpergröße ~ Geschlecht, data = daten)
-```
-
-::: callout-important
-Nur weil ein Effekt nicht signifikant ist, heißt das nicht, dass es keinen Effekt gibt! Denken Sie an die Vorlesung! Das heißt es wäre falsch etwas wie "es gibt keinen Unterschied zwischen männlichen und weiblichen Studierenden zu schreiben", schreiben Sie einfach "der Unterschied ist statistisch nicht signifikant".
-:::
-
-### Körpergröße \~ Händigkeit
-
-**Frage:** Gibt es einen signifikanten Unterschied in der Körpergröße in Abhaengigkeit der Händigkeit?
-
-Zur Abwechslung mache ich diesmal eine andere Visualisierung der Daten: ein Notchplot mit einem Beehive Plot überlagert. Der Vorteil dieser Visualisierung ist, dass man die Einfachheit des Boxplots hat, aber auch jeden einzelnen Datenpunkt sehen kann.
-
-::: callout-tip
-Hier verwende ich den Befehl `library(beeswarm)`. Mit \`library('Name-der-library') können wir zusätzliche Funktionen laden (ähnlich wie wenn sie in einem Betriebssystem eine zusätzliche Software öffnen und verwenden).
-:::
-
-Visualisierung:
-
-```{r, warning=F}
-library(beeswarm)
-boxplot(Körpergröße ~ Händigkeit, data = daten, notch = T, col = "lightgrey")
-beeswarm(Körpergröße ~ Händigkeit, data = daten, add = T, pwcol = daten$Geschlecht)
-
-```
-
-**H0:** Kein Unterschied.
-
-```{r}
-t.test(Körpergröße ~ Händigkeit, data = daten)
-```
-
-::: callout-tip
-Der p-Wert könnte kleiner werden, wenn man einseitig testet. Dies sollte man aber nur a priori und nicht auf Grundlage der Plots machen, weil letzteres verdecktes multiples Testen ist.
-
-```{r}
-t.test(Körpergröße ~ Händigkeit, data = daten, alternative = "less") # linksseitig
-t.test(Körpergröße ~ Händigkeit, data = daten, alternative = "greater") # rechtsseitig
-```
-:::
-
-## Test Numerisch+Numerisch
-
-### Körpergröße \~ Einwohner
-
-Visualisierung via scatterplot:
-
-```{r}
-plot(Körpergröße ~ Einwohner, data =daten)
-```
-
-Berechnen wir den Pearson Korrelationsfaktor:
-
-```{r}
-cor(daten$Einwohner, daten$Körpergröße, use = "complete.obs")
-```
-
-Schwache Korrelation, ist sie signifikant? Wir können die `cor.test` hernehmen um einen Korrelationstest zu berechnen (H0: Korrelation = 0):
-
-```{r}
-cor.test(daten$Einwohner, daten$Körpergröße, use = "complete.obs")
-```
-
-::: callout-note
-Ein kleiner Ausblick auf die kommenden Wochen: wir koennen die sogenannte lineare Regression ( $y = mx + t$ ) dazu nutzen um die Assoziation von Koerpergrosse \~ Einwohner durch eine Gerade darzustellen. D.h. in der linearen Regression werden die zwei Parameter $m$ (Steigung) und $t$ (Achsenabschnitt) geschätzt:
-
-```{r}
-fit <- lm(Körpergröße ~ Einwohner, data =daten)
-plot(Körpergröße ~ Einwohner, data =daten)
-abline(fit, col = "red", lwd = 2)
-```
-:::
-
-## Statistische power
-
-Die Power wird zum Beispiel von der Standardabweichung / Varianz der Daten beeinflusst:
-
-```{r}
-sd(daten$Körpergröße)
-```
-
-nehme vereinfacht an, dass 4 Beobachten je Gruppe gab. Ungleiche Gruppen hat die Funktion leider nicht. Wie viel n bräuchten wir bei der gegeben Streuung, um für einen Effekt von delta = 2 eine Power von 80% zu erreichen?
-
-```{r}
-power.t.test(delta = 2, sd = 8, power = 0.8)
-```
-
-delta = wahre Unterschied der Gruppen
-
-## Hypothesentest selbst gebaut
-
-Die Tests bis jetzt haben alle eine mathematische Funktion benutzt, um dem p-Wert auszurechnen. Wenn es eine solche Funktion gibt ist dies normalerweise vorteilhaft weil schneller.
-
-Wir können uns aber auch ganz einfach ohne Mathematik einen sogenannten nichtparametrischen Test selbst programmieren. Die Idee hier ist: wir randomisieren einfach die Daten viele Male und rechnen jeweils die Teststatistik aus. Hierdurch erhalten wir die Nullverteilung, aus der wir dann den p-Wert berechnen können. Hier am Beispiel der Korrelation
-
-```{r}
-x1 = daten$Körpergröße
-x2 = daten$Körpergewicht
-
-getNullValue <- function(){
-  x1Random = sample(x1, size = length(x1))
-  x2Random = sample(x2, size = length(x2))
-  return(cor(x1Random, x2Random))
-}
-
-getNullValue()
-
-nullDistribution = replicate(10000, getNullValue())
-
-hist(nullDistribution)
-
-obsCor = cor(x1, x2)
-
-abline(v = obsCor, col = "red")
-
-# linksseitig
-mean(nullDistribution <= obsCor)
-mean(nullDistribution >= obsCor)
-
-0.0031 *2
-```
-
-Das Ergebnis ist praktisch identisch mit cor.test
-
-```{r}
-cor.test(x1,x2)
-```
-
-# Woche 4 - MLE und Regression
-
-## num + num
-
-### Körpergewicht \~ Körpergröße
-
-```{r}
-plot(daten$Körpergröße, daten$Körpergewicht)
-
-cor.test(daten$Körpergewicht, daten$Körpergröße, 
-    use = "complete.obs", method = "spearman")
-```
-
-Lineare Regression
-
-```{r}
-fit <- lm(Körpergewicht ~ Körpergröße, data = daten)
-summary(fit)
-```
-
-Visualisierung
-
-```{r}
-plot(daten$Körpergröße, daten$Körpergewicht)
-abline(fit, col = "red")
-```
-
-alternative Visualisierung
-
-```{r}
-library(effects)
-plot(allEffects(fit, partial.residuals = T))
-```
-
-### Körpergewicht \~ Einwohner
-
-```{r}
-plot(daten$Einwohner, daten$Körpergewicht)
-```
-
-```{r}
-fit <- lm(Körpergewicht ~ Einwohner, data = daten)
-summary(fit)
-```
-
-```{r}
-library(effects)
-plot(allEffects(fit, partial.residuals = T))
-```
-
-## num + kat
-
-```{r}
-boxplot(Körpergewicht ~ Geschlecht, data = daten, notch = T)
-
-fit <- lm(Körpergewicht ~ Geschlecht, data = daten)
-summary(fit)
-```
-
-```{r}
-library(effects)
-plot(allEffects(fit, partial.residuals = T))
-```
-
-```{r}
-boxplot(Körpergewicht ~ Verkehrsmittel, data = daten, notch = T)
-fit <- lm(Körpergewicht ~ Verkehrsmittel, data = daten)
-summary(fit)
-```
-
-ANOVA
-
-```{r}
-summary(aov(fit))
-```
-
-# Woche 5 - Multiple Regression
-
-## Dienstag
-
-Beispiel multiple Regression
-
-```{r}
-fit <- lm(Ozone ~ Temp + Wind, data = airquality)
-summary(fit)
-
-```
-
-Vergleich einfache Regression
-
-```{r}
-fit <- lm(Ozone ~ Temp , data = airquality)
-summary(fit)
-```
-
-Die Unterschiede in den Effektschätzern entstehen durch die Kollinearität zwischen Wind und Temperatur
-
-```{r}
-plot(Temp ~ Wind, data = airquality)
-```
-
-## Donnerstag
-
-### Beispiel LRT
-
-```{r}
-ratios = rep(NA, 1000)
-for(i in 1:1000){
-  # erzeuge Daten ohne Abhängigkeit
-  x = rnorm(100)
-  y = rnorm(100)
-  # vergleiche Log Likelihood M1 = y ~ x , M0 = y ~ 1
-  ratios[i] = logLik(lm(y ~ x))  - logLik(lm(y ~ 1))
-}
-
-hist(ratios, breaks = 100)
-
-```
-
-### Analyse Ihrer Daten
-
-### Körpergewicht \~ Vegetarier
-
-Einfache Regression
-
-```{r}
-plot(Körpergewicht ~ Vegetarier, data =daten, col = "lightgrey", notch = T)
-fit <- lm(Körpergewicht ~ Vegetarier, data =daten)
-summary(fit)
-```
-
-Könnte Scheinkorrelation sein wegen Vegetarier \~ Geschlecht, deshalb multiple Regression
-
-```{r}
-fit <- lm(Körpergewicht ~ Vegetarier + Geschlecht, data =daten)
-summary(fit)
-```
-
-### Körpergewicht \~ Verkehrsmittel
-
-```{r}
-boxplot(Körpergewicht ~ Verkehrsmittel, data =daten)
-fit <- lm(Körpergewicht ~ Verkehrsmittel, data =daten)
-summary(fit)
-
-```
-
-Auch hier haben wir nach Diskussion in der Klasse überlegt, ob dies eine Scheinkorrelation sein könnte, wegen Verkehrsmittel \~ Geschlecht, ev. Distanz.
-
-Multiple Regression und Kreuztabelle bestätigt das
-
-```{r}
-fit <- lm(Körpergewicht ~ Verkehrsmittel + Geschlecht + Distanz, data =daten)
-summary(fit)
-
-table(daten$Geschlecht, daten$Verkehrsmittel)
-```
-
-Final noch ein Beispiel für die Modellselektion - Geschlecht wird selektiert, eine zufällige Variable nicht.
-
-```{r}
-daten$random = rnorm(nrow(daten))
-
-M0 <- lm(Körpergewicht ~ Verkehrsmittel, data =daten)
-M1 <- lm(Körpergewicht ~ Verkehrsmittel + Geschlecht , data =daten)
-M2 <- lm(Körpergewicht ~ Verkehrsmittel + random , data =daten)
-
-```
-
-Selektion der Modelle über LRTs / ANOVA
-
-```{r}
-summary(aov(M2))
-```
-
-Selektion der Modelle über AIC
-
-```{r}
-AIC(M0)
-AIC(M1)
-AIC(M2)
-```
-
-# Woche 6 - GLM
-
-## Dienstag
-
-Interessieren uns für die Assoziazion Veg \~ Geschlecht. Erinnerung: deskriptiv über Kreuztabelle + gruppiertes Balkendiagram
-
-```{r}
-x = table(daten$Vegetarier, daten$Geschlecht)
-x
-barplot(x, beside = T)
-```
-
-Könnten einen Hypothesentest machen
-
-```{r}
-prop.test(x)
-```
-
-Aber Regression ist allgemeiner. Abhängige Variable ist 0/1, deshalb logische Regression:
-
-```{r}
-fit <- glm(Vegetarier ~ Geschlecht, 
-           family = "binomial",
-           data = daten)
-summary(fit)
-```
-
-Beispiele Transformation der Regressionstabelle auf Vorhersagen (Response):
-
-```{r}
-plogis(1.47) # Männer
-plogis(1.47-1.17) # Frauen
-```
-
-Visualisierung:
-
-```{r}
-library(effects)
-plot(allEffects(fit))
-```
-
-Multiples GLM
-
-```{r}
-fit <- glm(Vegetarier ~ Geschlecht + Körpergewicht, 
-           family = "binomial",
-           data = daten)
-summary(fit)
-```
-
-Visualisierung:
-
-```{r}
-library(effects)
-plot(allEffects(fit))
-```
-
-
-
+# Woche 7

@@ -85,7 +85,161 @@ skewness(titanic$age, na.rm = T)
 
 # Woche 2
 
+## Kategorisch vs kategorisch
+
+```{r}
+library(effects)
+head(TitanicSurvival)
+
+View(TitanicSurvival)
+
+
+kreuz = table(TitanicSurvival$sex, TitanicSurvival$passengerClass)
+print(kreuz)
+
+barplot(kreuz)
+legend("topleft", legend = c("Male", "Female"), col = c("gray", "black"), pch = 15)
+
+kreuz = table(TitanicSurvival$passengerClass, TitanicSurvival$sex)
+barplot(kreuz, beside = TRUE)
+
+mosaicplot(kreuz)
+```
+
+## Kategorisch vs numerisch
+
+Erinnerung boxplot, auf der X - Achse kategorische Variable
+
+```{r}
+
+boxplot(age~passengerClass, data = TitanicSurvival)
+
+## Mit Notch
+boxplot(age~passengerClass, data = TitanicSurvival, notch = TRUE)
+
+par(mar = c(7, 5, 3, 1))
+boxplot(age~passengerClass+sex, data = TitanicSurvival, notch = TRUE, las = 2, xlab = "")
+```
+
+## Numerisch vs numerisch
+
+```{r}
+
+head(iris)
+plot(Sepal.Length~Petal.Length, data = iris)
+cor(iris$Sepal.Length, iris$Petal.Length)
+cor(iris$Sepal.Length, iris$Petal.Length, method = "spearman")
+
+plot(Sepal.Length~log(Petal.Length), data = iris)
+cor(iris$Sepal.Length, log(iris$Petal.Length))
+cor(iris$Sepal.Length, log(iris$Petal.Length), method = "spearman")
+
+cor.test(iris$Sepal.Length, iris$Petal.Length, method = "pearson")
+
+```
+
+## PCA
+
+```{r}
+pca = prcomp(airquality[complete.cases(airquality),1:4], scale = TRUE)
+biplot(pca)
+```
+
 # Woche 3
+
+Daten vorbereiten - wie man das Package "Ecodata" mit den Daten installiert wurde in Woche 1 erklärt
+
+```{r}
+library(EcoData) 
+# str(titanic)
+
+titanic$pclass = factor(titanic$pclass, labels = c("1.Kl", "2.Kl", "3.Kl"))
+titanic$sex = factor(titanic$sex)
+titanic$embarked = factor(titanic$embarked)
+titanic$survived = factor(titanic$survived, labels = c("died", "survived"))
+```
+
+## Tests auf Kreuztabellen (kat+kat)
+
+Kreuztabelle berechnen und visualisieren
+
+```{r}
+x = table(titanic$survived, titanic$sex)
+x
+barplot(x, beside = T)
+```
+
+Wenn mindestens eine der Variablen binär ist kann man den prop.test machen
+
+```{r}
+prop.test(x)
+```
+
+Ansonsten Chi2 Test
+
+```{r}
+chisq.test(x)
+```
+
+## Tests auf Unterschiede im Mittelwert von 2 Gruppen (kat + num)
+
+Wir schauen uns an die Altersunterschiede zwischen Geschlechtern
+
+```{r}
+boxplot(age ~ sex, data = titanic, notch = T)
+```
+
+Sind die beiden Gruppen normalverteilt?
+
+```{r}
+shapiro.test(titanic$age[titanic$sex == "female"])
+hist(titanic$age[titanic$sex == "female"])
+shapiro.test(titanic$age[titanic$sex != "female"])
+```
+
+Nein, also machen wir den nichtparametrischen Mann-Whitney U test, der in R mit der Funktion wilcox.test berechnet wird
+
+```{r}
+wilcox.test(titanic$age[titanic$sex == "female"],
+            titanic$age[titanic$sex == "male"])
+```
+
+Gerade noch signifikant. Mit weniger Daten (= weniger Power) würde das Ergebnis n.s.
+
+```{r}
+titanic2 = titanic[sample.int(nrow(titanic), 300), ]
+
+wilcox.test(titanic$age[titanic2$sex == "female"],
+            titanic$age[titanic2$sex == "male"])
+```
+
+Hier als Beispiel noch mal das gleiche mit einem t-Test, den wir aber aufgrund des signifikanten Shapiro tests (H0 = Normalverteilung) eigentlich nicht anwenden sollten
+
+```{r}
+t.test(titanic$age[titanic$sex == "female"],
+            titanic$age[titanic$sex == "male"])
+```
+
+## Tests auf Korrelation (num + num)
+
+Als letztes schauen wir uns Tests auf Korrelation an. Hierzu benutzen wir den Datensatz plantHeight im Package ecodata, und schauen auf die Korrelation zwischen Temperatur und Pflanzengröße.
+
+```{r}
+#str(plantHeight)
+plot(loght ~ temp, data = plantHeight)
+```
+
+Pearson (lineare) Korrelation
+
+```{r}
+cor.test(plantHeight$loght, plantHeight$temp)
+```
+
+Würden Sie erwarten, dass sich die Werte ändern, wenn wir auf einen Rangkorrelationskoeffizienten wechseln? Probieren wir es aus!
+
+```{r}
+cor.test(plantHeight$loght, plantHeight$temp, method = "spearman")
+```
 
 # Woche 4
 

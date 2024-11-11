@@ -243,6 +243,67 @@ cor.test(plantHeight$loght, plantHeight$temp, method = "spearman")
 
 # Woche 4
 
+Laden der Daten, zur Installation des Package "EcoData" siehe Woche 1.
+
+```{r}
+library(EcoData)
+plantHeight$growthform2 = relevel(as.factor(plantHeight$growthform), "Tree")
+```
+
+## Numerische erklärende Variable
+
+Beziehung Höhe gegen Temperatur
+
+```{r}
+plot(loght ~ temp, data = plantHeight)
+```
+
+Fit lineare Regression
+
+```{r}
+fit <- lm(loght ~ temp, data = plantHeight)
+summary(fit)
+```
+
+Visualisierung
+
+```{r}
+library(effects)
+plot(allEffects(fit))
+plot(allEffects(fit, partial.residuals = T))
+```
+
+## Kategoriale erklärende Variable
+
+```{r}
+plot(loght ~ growthform2, data = plantHeight, las = 2)
+
+fit = lm(loght ~ growthform2, data = plantHeight)
+summary(fit)
+```
+
+## Residuenanalyse
+
+Hier exemplarisch nur für das erste Modell
+
+```{r}
+fit <- lm(loght ~ temp, data = plantHeight)
+par(mfrow = c(2,2))
+plot(fit)
+
+plot(allEffects(fit, partial.residuals = T))
+```
+
+## Ausblick
+
+Was wenn Temperatur und Wuchsform beide einen Effekt haben? Visuell sehen wir das hier
+
+```{r}
+plot(loght ~ temp, data = plantHeight, col = as.numeric(plantHeight$growthform2))
+```
+
+Wie man diese multiple Regression fittet, besprechen wir nächste Woche!
+
 # Woche 5
 
 # Woche 6

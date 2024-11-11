@@ -99,7 +99,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#tests-auf-unterschiede-im-mittelwert-von-2-gruppen-kat-num" id="toc-tests-auf-unterschiede-im-mittelwert-von-2-gruppen-kat-num" class="nav-link" data-scroll-target="#tests-auf-unterschiede-im-mittelwert-von-2-gruppen-kat-num">Tests auf Unterschiede im Mittelwert von 2 Gruppen (kat + num)</a></li>
   <li><a href="#tests-auf-korrelation-num-num" id="toc-tests-auf-korrelation-num-num" class="nav-link" data-scroll-target="#tests-auf-korrelation-num-num">Tests auf Korrelation (num + num)</a></li>
   </ul></li>
-  <li><a href="#woche-4" id="toc-woche-4" class="nav-link" data-scroll-target="#woche-4">Woche 4</a></li>
+  <li><a href="#woche-4" id="toc-woche-4" class="nav-link" data-scroll-target="#woche-4">Woche 4</a>
+  <ul class="collapse">
+  <li><a href="#numerische-erklärende-variable" id="toc-numerische-erklärende-variable" class="nav-link" data-scroll-target="#numerische-erklärende-variable">Numerische erklärende Variable</a></li>
+  <li><a href="#kategoriale-erklärende-variable" id="toc-kategoriale-erklärende-variable" class="nav-link" data-scroll-target="#kategoriale-erklärende-variable">Kategoriale erklärende Variable</a></li>
+  <li><a href="#residuenanalyse" id="toc-residuenanalyse" class="nav-link" data-scroll-target="#residuenanalyse">Residuenanalyse</a></li>
+  <li><a href="#ausblick" id="toc-ausblick" class="nav-link" data-scroll-target="#ausblick">Ausblick</a></li>
+  </ul></li>
   <li><a href="#woche-5" id="toc-woche-5" class="nav-link" data-scroll-target="#woche-5">Woche 5</a></li>
   <li><a href="#woche-6" id="toc-woche-6" class="nav-link" data-scroll-target="#woche-6">Woche 6</a></li>
   <li><a href="#woche-7" id="toc-woche-7" class="nav-link" data-scroll-target="#woche-7">Woche 7</a></li>
@@ -590,7 +596,7 @@ sample estimates:
 0.4962426 </code></pre>
 </div>
 </div>
-<p>Würden Sie erwarten, dass sich die Werte ändern, wenn sie auf einen Rangkorrelationskoeffizienten wechseln? Probieren wir es aus!</p>
+<p>Würden Sie erwarten, dass sich die Werte ändern, wenn wir auf einen Rangkorrelationskoeffizienten wechseln? Probieren wir es aus!</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb93"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb93-1"><a href="#cb93-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cor.test</span>(plantHeight<span class="sc">$</span>loght, plantHeight<span class="sc">$</span>temp, <span class="at">method =</span> <span class="st">"spearman"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
@@ -613,6 +619,121 @@ sample estimates:
 </section>
 <section id="woche-4" class="level1">
 <h1>Woche 4</h1>
+<p>Laden der Daten, zur Installation des Package “EcoData” siehe Woche 1.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb96"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb96-1"><a href="#cb96-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(EcoData)</span>
+<span id="cb96-2"><a href="#cb96-2" aria-hidden="true" tabindex="-1"></a>plantHeight<span class="sc">$</span>growthform2 <span class="ot">=</span> <span class="fu">relevel</span>(<span class="fu">as.factor</span>(plantHeight<span class="sc">$</span>growthform), <span class="st">"Tree"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="numerische-erklärende-variable" class="level2">
+<h2 class="anchored" data-anchor-id="numerische-erklärende-variable">Numerische erklärende Variable</h2>
+<p>Beziehung Höhe gegen Temperatur</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb97"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb97-1"><a href="#cb97-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(loght <span class="sc">~</span> temp, <span class="at">data =</span> plantHeight)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Fit lineare Regression</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb98"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb98-1"><a href="#cb98-1" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(loght <span class="sc">~</span> temp, <span class="at">data =</span> plantHeight)</span>
+<span id="cb98-2"><a href="#cb98-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = loght ~ temp, data = plantHeight)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-1.97903 -0.42804 -0.00918  0.43200  1.79893 
+
+Coefficients:
+             Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept) -0.225665   0.103776  -2.175    0.031 *  
+temp         0.042414   0.005593   7.583 1.87e-12 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.6848 on 176 degrees of freedom
+Multiple R-squared:  0.2463,    Adjusted R-squared:  0.242 
+F-statistic:  57.5 on 1 and 176 DF,  p-value: 1.868e-12</code></pre>
+</div>
+</div>
+<p>Visualisierung</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb100"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb100-1"><a href="#cb100-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(effects)</span>
+<span id="cb100-2"><a href="#cb100-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">allEffects</span>(fit))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb101"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb101-1"><a href="#cb101-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">allEffects</span>(fit, <span class="at">partial.residuals =</span> T))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-24-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="kategoriale-erklärende-variable" class="level2">
+<h2 class="anchored" data-anchor-id="kategoriale-erklärende-variable">Kategoriale erklärende Variable</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb102"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb102-1"><a href="#cb102-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(loght <span class="sc">~</span> growthform2, <span class="at">data =</span> plantHeight, <span class="at">las =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-25-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb103"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb103-1"><a href="#cb103-1" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">=</span> <span class="fu">lm</span>(loght <span class="sc">~</span> growthform2, <span class="at">data =</span> plantHeight)</span>
+<span id="cb103-2"><a href="#cb103-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = loght ~ growthform2, data = plantHeight)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-1.32294 -0.26091  0.03608  0.24666  1.50761 
+
+Coefficients:
+                      Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)            1.26091    0.05335  23.637  &lt; 2e-16 ***
+growthform2Fern       -1.00564    0.42004  -2.394  0.01780 *  
+growthform2Herb       -1.67510    0.08241 -20.327  &lt; 2e-16 ***
+growthform2Herb/Shrub -1.08482    0.42004  -2.583  0.01069 *  
+growthform2Shrub      -1.09287    0.07993 -13.673  &lt; 2e-16 ***
+growthform2Shrub/Tree -0.43565    0.13157  -3.311  0.00115 ** 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.4166 on 162 degrees of freedom
+  (10 observations deleted due to missingness)
+Multiple R-squared:  0.7366,    Adjusted R-squared:  0.7285 
+F-statistic: 90.62 on 5 and 162 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+</section>
+<section id="residuenanalyse" class="level2">
+<h2 class="anchored" data-anchor-id="residuenanalyse">Residuenanalyse</h2>
+<p>Hier exemplarisch nur für das erste Modell</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb105"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb105-1"><a href="#cb105-1" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(loght <span class="sc">~</span> temp, <span class="at">data =</span> plantHeight)</span>
+<span id="cb105-2"><a href="#cb105-2" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">2</span>))</span>
+<span id="cb105-3"><a href="#cb105-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-26-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb106"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb106-1"><a href="#cb106-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">allEffects</span>(fit, <span class="at">partial.residuals =</span> T))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-26-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="ausblick" class="level2">
+<h2 class="anchored" data-anchor-id="ausblick">Ausblick</h2>
+<p>Was wenn Temperatur und Wuchsform beide einen Effekt haben? Visuell sehen wir das hier</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb107"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(loght <span class="sc">~</span> temp, <span class="at">data =</span> plantHeight, <span class="at">col =</span> <span class="fu">as.numeric</span>(plantHeight<span class="sc">$</span>growthform2))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-27-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Wie man diese multiple Regression fittet, besprechen wir nächste Woche!</p>
+</section>
 </section>
 <section id="woche-5" class="level1">
 <h1>Woche 5</h1>

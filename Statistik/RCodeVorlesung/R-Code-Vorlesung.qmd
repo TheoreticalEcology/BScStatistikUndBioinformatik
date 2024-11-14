@@ -306,6 +306,79 @@ Wie man diese multiple Regression fittet, besprechen wir nächste Woche!
 
 # Woche 5
 
+```{r}
+library(EcoData)
+
+#str(titanic)
+titanic$fSex = factor(titanic$sex)
+titanic$fPclass = factor(titanic$pclass)
+```
+
+```{r}
+boxplot(age ~ fSex, data = titanic, notch = T)
+
+fit = lm(age ~ sex, data = titanic)
+summary(fit)
+```
+
+Multiple Regression
+
+```{r}
+fit = lm(age ~ sex + fPclass , data = titanic)
+summary(fit)
+
+library(effects)
+plot(allEffects(fit))
+
+```
+
+Mit Interaktion
+
+```{r}
+fit = lm(age ~ sex * fPclass , data = titanic)
+summary(fit)
+
+library(effects)
+plot(allEffects(fit))
+```
+
+Beispiel kontinuierlich
+
+```{r}
+plot(loght ~ lat  , data = plantHeight)
+plot(loght ~ NPP  , data = plantHeight)
+
+fit <- lm(loght ~ lat  , data = plantHeight)
+summary(fit)
+
+fit <- lm(loght ~ lat + NPP + temp , data = plantHeight)
+summary(fit)
+```
+
+## Modellselection
+
+### ANOVA
+
+```{r}
+summary(aov(fit))
+```
+
+Vorsicht! Reihenfolge macht einen Unterschied
+
+```{r}
+fit <- lm(loght ~ NPP + temp + lat, data = plantHeight)
+summary(aov(fit))
+```
+
+### AIC
+
+```{r}
+m1 <- lm(loght ~ NPP + temp , data = plantHeight)
+m2 <- lm(loght ~ NPP + temp + lat , data = plantHeight)
+AIC(m1)
+AIC(m2)
+```
+
 # Woche 6
 
 # Woche 7

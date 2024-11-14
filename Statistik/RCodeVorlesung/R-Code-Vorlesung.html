@@ -106,7 +106,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#residuenanalyse" id="toc-residuenanalyse" class="nav-link" data-scroll-target="#residuenanalyse">Residuenanalyse</a></li>
   <li><a href="#ausblick" id="toc-ausblick" class="nav-link" data-scroll-target="#ausblick">Ausblick</a></li>
   </ul></li>
-  <li><a href="#woche-5" id="toc-woche-5" class="nav-link" data-scroll-target="#woche-5">Woche 5</a></li>
+  <li><a href="#woche-5" id="toc-woche-5" class="nav-link" data-scroll-target="#woche-5">Woche 5</a>
+  <ul class="collapse">
+  <li><a href="#modellselection" id="toc-modellselection" class="nav-link" data-scroll-target="#modellselection">Modellselection</a>
+  <ul class="collapse">
+  <li><a href="#anova" id="toc-anova" class="nav-link" data-scroll-target="#anova">ANOVA</a></li>
+  <li><a href="#aic" id="toc-aic" class="nav-link" data-scroll-target="#aic">AIC</a></li>
+  </ul></li>
+  </ul></li>
   <li><a href="#woche-6" id="toc-woche-6" class="nav-link" data-scroll-target="#woche-6">Woche 6</a></li>
   <li><a href="#woche-7" id="toc-woche-7" class="nav-link" data-scroll-target="#woche-7">Woche 7</a></li>
   </ul>
@@ -737,6 +744,217 @@ F-statistic: 90.62 on 5 and 162 DF,  p-value: &lt; 2.2e-16</code></pre>
 </section>
 <section id="woche-5" class="level1">
 <h1>Woche 5</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb108"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb108-1"><a href="#cb108-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(EcoData)</span>
+<span id="cb108-2"><a href="#cb108-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb108-3"><a href="#cb108-3" aria-hidden="true" tabindex="-1"></a><span class="co">#str(titanic)</span></span>
+<span id="cb108-4"><a href="#cb108-4" aria-hidden="true" tabindex="-1"></a>titanic<span class="sc">$</span>fSex <span class="ot">=</span> <span class="fu">factor</span>(titanic<span class="sc">$</span>sex)</span>
+<span id="cb108-5"><a href="#cb108-5" aria-hidden="true" tabindex="-1"></a>titanic<span class="sc">$</span>fPclass <span class="ot">=</span> <span class="fu">factor</span>(titanic<span class="sc">$</span>pclass)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb109"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb109-1"><a href="#cb109-1" aria-hidden="true" tabindex="-1"></a><span class="fu">boxplot</span>(age <span class="sc">~</span> fSex, <span class="at">data =</span> titanic, <span class="at">notch =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-29-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb110"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb110-1"><a href="#cb110-1" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">=</span> <span class="fu">lm</span>(age <span class="sc">~</span> sex, <span class="at">data =</span> titanic)</span>
+<span id="cb110-2"><a href="#cb110-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = age ~ sex, data = titanic)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-30.252  -9.585  -1.687   8.415  49.415 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)  28.6871     0.7306  39.265   &lt;2e-16 ***
+sexmale       1.8982     0.9212   2.061   0.0396 *  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 14.39 on 1044 degrees of freedom
+  (263 observations deleted due to missingness)
+Multiple R-squared:  0.004051,  Adjusted R-squared:  0.003097 
+F-statistic: 4.246 on 1 and 1044 DF,  p-value: 0.03959</code></pre>
+</div>
+</div>
+<p>Multiple Regression</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb112"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb112-1"><a href="#cb112-1" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">=</span> <span class="fu">lm</span>(age <span class="sc">~</span> sex <span class="sc">+</span> fPclass , <span class="at">data =</span> titanic)</span>
+<span id="cb112-2"><a href="#cb112-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = age ~ sex + fPclass, data = titanic)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-39.985  -7.934  -0.945   7.775  48.055 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)  37.1819     0.8925  41.659  &lt; 2e-16 ***
+sexmale       3.7203     0.8418   4.419 1.09e-05 ***
+fPclass2.Kl  -9.9273     1.1176  -8.883  &lt; 2e-16 ***
+fPclass3.Kl -14.9571     0.9765 -15.317  &lt; 2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 13.01 on 1042 degrees of freedom
+  (263 observations deleted due to missingness)
+Multiple R-squared:  0.1872,    Adjusted R-squared:  0.1849 
+F-statistic: 80.01 on 3 and 1042 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb114"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb114-1"><a href="#cb114-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(effects)</span>
+<span id="cb114-2"><a href="#cb114-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">allEffects</span>(fit))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-30-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Mit Interaktion</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb115"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb115-1"><a href="#cb115-1" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">=</span> <span class="fu">lm</span>(age <span class="sc">~</span> sex <span class="sc">*</span> fPclass , <span class="at">data =</span> titanic)</span>
+<span id="cb115-2"><a href="#cb115-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = age ~ sex * fPclass, data = titanic)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-40.113  -7.815  -0.962   7.815  48.038 
+
+Coefficients:
+                    Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)          37.0376     1.1294  32.794  &lt; 2e-16 ***
+sexmale               3.9917     1.5489   2.577   0.0101 *  
+fPclass2.Kl          -9.5384     1.7096  -5.579 3.08e-08 ***
+fPclass3.Kl         -14.8523     1.5465  -9.604  &lt; 2e-16 ***
+sexmale:fPclass2.Kl  -0.6754     2.2627  -0.299   0.7654    
+sexmale:fPclass3.Kl  -0.2147     2.0003  -0.107   0.9145    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 13.02 on 1040 degrees of freedom
+  (263 observations deleted due to missingness)
+Multiple R-squared:  0.1873,    Adjusted R-squared:  0.1834 
+F-statistic: 47.94 on 5 and 1040 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb117"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb117-1"><a href="#cb117-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(effects)</span>
+<span id="cb117-2"><a href="#cb117-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">allEffects</span>(fit))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-31-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Beispiel kontinuierlich</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb118"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb118-1"><a href="#cb118-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(loght <span class="sc">~</span> lat  , <span class="at">data =</span> plantHeight)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-32-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb119"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb119-1"><a href="#cb119-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(loght <span class="sc">~</span> NPP  , <span class="at">data =</span> plantHeight)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-32-2.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb120"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb120-1"><a href="#cb120-1" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(loght <span class="sc">~</span> lat  , <span class="at">data =</span> plantHeight)</span>
+<span id="cb120-2"><a href="#cb120-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = loght ~ lat, data = plantHeight)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-1.94564 -0.48446  0.05458  0.41723  1.61132 
+
+Coefficients:
+             Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)  1.157797   0.108817  10.640  &lt; 2e-16 ***
+lat         -0.022359   0.003059  -7.309 9.04e-12 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.6909 on 176 degrees of freedom
+Multiple R-squared:  0.2329,    Adjusted R-squared:  0.2285 
+F-statistic: 53.42 on 1 and 176 DF,  p-value: 9.041e-12</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb122"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb122-1"><a href="#cb122-1" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(loght <span class="sc">~</span> lat <span class="sc">+</span> NPP <span class="sc">+</span> temp , <span class="at">data =</span> plantHeight)</span>
+<span id="cb122-2"><a href="#cb122-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = loght ~ lat + NPP + temp, data = plantHeight)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-1.70134 -0.47284  0.03706  0.40266  1.76495 
+
+Coefficients:
+              Estimate Std. Error t value Pr(&gt;|t|)   
+(Intercept) -0.1558922  0.5302162  -0.294  0.76911   
+lat         -0.0023404  0.0086876  -0.269  0.78796   
+NPP          0.0003839  0.0001218   3.153  0.00192 **
+temp         0.0191505  0.0151636   1.263  0.20837   
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 0.6729 on 168 degrees of freedom
+  (6 observations deleted due to missingness)
+Multiple R-squared:  0.2842,    Adjusted R-squared:  0.2714 
+F-statistic: 22.24 on 3 and 168 DF,  p-value: 3.556e-12</code></pre>
+</div>
+</div>
+<section id="modellselection" class="level2">
+<h2 class="anchored" data-anchor-id="modellselection">Modellselection</h2>
+<section id="anova" class="level3">
+<h3 class="anchored" data-anchor-id="anova">ANOVA</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb124"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb124-1"><a href="#cb124-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">aov</span>(fit))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>             Df Sum Sq Mean Sq F value   Pr(&gt;F)    
+lat           1  24.79  24.787  54.741 6.26e-12 ***
+NPP           1   4.70   4.698  10.375  0.00153 ** 
+temp          1   0.72   0.722   1.595  0.20837    
+Residuals   168  76.07   0.453                     
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+6 observations deleted due to missingness</code></pre>
+</div>
+</div>
+<p>Vorsicht! Reihenfolge macht einen Unterschied</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb126"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb126-1"><a href="#cb126-1" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">lm</span>(loght <span class="sc">~</span> NPP <span class="sc">+</span> temp <span class="sc">+</span> lat, <span class="at">data =</span> plantHeight)</span>
+<span id="cb126-2"><a href="#cb126-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">aov</span>(fit))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>             Df Sum Sq Mean Sq F value   Pr(&gt;F)    
+NPP           1  26.37  26.367  58.231 1.66e-12 ***
+temp          1   3.81   3.807   8.407  0.00424 ** 
+lat           1   0.03   0.033   0.073  0.78796    
+Residuals   168  76.07   0.453                     
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+6 observations deleted due to missingness</code></pre>
+</div>
+</div>
+</section>
+<section id="aic" class="level3">
+<h3 class="anchored" data-anchor-id="aic">AIC</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb128"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb128-1"><a href="#cb128-1" aria-hidden="true" tabindex="-1"></a>m1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(loght <span class="sc">~</span> NPP <span class="sc">+</span> temp , <span class="at">data =</span> plantHeight)</span>
+<span id="cb128-2"><a href="#cb128-2" aria-hidden="true" tabindex="-1"></a>m2 <span class="ot">&lt;-</span> <span class="fu">lm</span>(loght <span class="sc">~</span> NPP <span class="sc">+</span> temp <span class="sc">+</span> lat , <span class="at">data =</span> plantHeight)</span>
+<span id="cb128-3"><a href="#cb128-3" aria-hidden="true" tabindex="-1"></a><span class="fu">AIC</span>(m1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 355.868</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb130"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb130-1"><a href="#cb130-1" aria-hidden="true" tabindex="-1"></a><span class="fu">AIC</span>(m2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 357.7937</code></pre>
+</div>
+</div>
+</section>
+</section>
 </section>
 <section id="woche-6" class="level1">
 <h1>Woche 6</h1>

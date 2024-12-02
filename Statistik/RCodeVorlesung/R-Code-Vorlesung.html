@@ -114,7 +114,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#aic" id="toc-aic" class="nav-link" data-scroll-target="#aic">AIC</a></li>
   </ul></li>
   </ul></li>
-  <li><a href="#woche-6" id="toc-woche-6" class="nav-link" data-scroll-target="#woche-6">Woche 6</a></li>
+  <li><a href="#woche-6" id="toc-woche-6" class="nav-link" data-scroll-target="#woche-6">Woche 6</a>
+  <ul class="collapse">
+  <li><a href="#logistische-regression" id="toc-logistische-regression" class="nav-link" data-scroll-target="#logistische-regression">Logistische Regression</a></li>
+  <li><a href="#poisson-regression" id="toc-poisson-regression" class="nav-link" data-scroll-target="#poisson-regression">Poisson Regression</a></li>
+  <li><a href="#anova-r2-modellselektion-für-glms" id="toc-anova-r2-modellselektion-für-glms" class="nav-link" data-scroll-target="#anova-r2-modellselektion-für-glms">ANOVA, R2, Modellselektion für GLMs</a>
+  <ul class="collapse">
+  <li><a href="#pseudo-r2" id="toc-pseudo-r2" class="nav-link" data-scroll-target="#pseudo-r2">Pseudo R2</a></li>
+  <li><a href="#modellvergleich" id="toc-modellvergleich" class="nav-link" data-scroll-target="#modellvergleich">Modellvergleich</a></li>
+  </ul></li>
+  </ul></li>
   <li><a href="#woche-7" id="toc-woche-7" class="nav-link" data-scroll-target="#woche-7">Woche 7</a></li>
   </ul>
 </nav>
@@ -958,9 +967,256 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 </section>
 <section id="woche-6" class="level1">
 <h1>Woche 6</h1>
+<section id="logistische-regression" class="level2">
+<h2 class="anchored" data-anchor-id="logistische-regression">Logistische Regression</h2>
+<p>Binomial GLM (logischtische Regression)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb132"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb132-1"><a href="#cb132-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(EcoData)</span>
+<span id="cb132-2"><a href="#cb132-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb132-3"><a href="#cb132-3" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">glm</span>(survived <span class="sc">~</span> age, <span class="at">data =</span> titanic, <span class="at">family =</span> binomial)</span>
+<span id="cb132-4"><a href="#cb132-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+glm(formula = survived ~ age, family = binomial, data = titanic)
+
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-1.1189  -1.0361  -0.9768   1.3187   1.5162  
+
+Coefficients:
+             Estimate Std. Error z value Pr(&gt;|z|)  
+(Intercept) -0.136531   0.144715  -0.943   0.3455  
+age         -0.007899   0.004407  -1.792   0.0731 .
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 1414.6  on 1045  degrees of freedom
+Residual deviance: 1411.4  on 1044  degrees of freedom
+  (263 observations deleted due to missingness)
+AIC: 1415.4
+
+Number of Fisher Scoring iterations: 4</code></pre>
+</div>
+</div>
+<p>Effekte berechnen und visualisieren</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb134"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb134-1"><a href="#cb134-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(effects)</span>
+<span id="cb134-2"><a href="#cb134-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">allEffects</span>(fit))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-37-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb135"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb135-1"><a href="#cb135-1" aria-hidden="true" tabindex="-1"></a><span class="fu">curve</span>(plogis, <span class="sc">-</span><span class="dv">4</span>,<span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-37-2.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb136"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb136-1"><a href="#cb136-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plogis</span>(<span class="sc">-</span><span class="fl">0.136531</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.4659202</code></pre>
+</div>
+</div>
+</section>
+<section id="poisson-regression" class="level2">
+<h2 class="anchored" data-anchor-id="poisson-regression">Poisson Regression</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb138"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb138-1"><a href="#cb138-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(feeding <span class="sc">~</span> attractiveness, <span class="at">data =</span> birdfeeding)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-38-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb139"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb139-1"><a href="#cb139-1" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">glm</span>(feeding <span class="sc">~</span> attractiveness, <span class="at">data =</span> birdfeeding, <span class="at">family =</span> poisson)</span>
+<span id="cb139-2"><a href="#cb139-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb139-3"><a href="#cb139-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+glm(formula = feeding ~ attractiveness, family = poisson, data = birdfeeding)
+
+Deviance Residuals: 
+     Min        1Q    Median        3Q       Max  
+-1.55377  -0.72834   0.03699   0.59093   1.54584  
+
+Coefficients:
+               Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept)     1.47459    0.19443   7.584 3.34e-14 ***
+attractiveness  0.14794    0.05437   2.721  0.00651 ** 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for poisson family taken to be 1)
+
+    Null deviance: 25.829  on 24  degrees of freedom
+Residual deviance: 18.320  on 23  degrees of freedom
+AIC: 115.42
+
+Number of Fisher Scoring iterations: 4</code></pre>
+</div>
+</div>
+<p>Effekte visualisieren</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb141"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb141-1"><a href="#cb141-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">allEffects</span>(fit))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="R-Code-Vorlesung_files/figure-html/unnamed-chunk-39-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Poisson ohne Link funktion</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb142"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb142-1"><a href="#cb142-1" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">glm</span>(feeding <span class="sc">~</span> attractiveness, <span class="at">data =</span> birdfeeding, <span class="at">family =</span> <span class="fu">poisson</span>(<span class="at">link =</span> <span class="st">"identity"</span>))</span>
+<span id="cb142-2"><a href="#cb142-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb142-3"><a href="#cb142-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+glm(formula = feeding ~ attractiveness, family = poisson(link = "identity"), 
+    data = birdfeeding)
+
+Deviance Residuals: 
+     Min        1Q    Median        3Q       Max  
+-1.48678  -0.73750   0.00277   0.63563   1.52125  
+
+Coefficients:
+               Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept)      3.8635     1.1153   3.464 0.000532 ***
+attractiveness   1.0322     0.3672   2.811 0.004937 ** 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for poisson family taken to be 1)
+
+    Null deviance: 25.829  on 24  degrees of freedom
+Residual deviance: 18.179  on 23  degrees of freedom
+AIC: 115.28
+
+Number of Fisher Scoring iterations: 4</code></pre>
+</div>
+</div>
+</section>
+<section id="anova-r2-modellselektion-für-glms" class="level2">
+<h2 class="anchored" data-anchor-id="anova-r2-modellselektion-für-glms">ANOVA, R2, Modellselektion für GLMs</h2>
+<section id="pseudo-r2" class="level3">
+<h3 class="anchored" data-anchor-id="pseudo-r2">Pseudo R2</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb144"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb144-1"><a href="#cb144-1" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">glm</span>(survived <span class="sc">~</span> age, <span class="at">data =</span> titanic, <span class="at">family =</span> binomial)</span>
+<span id="cb144-2"><a href="#cb144-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+glm(formula = survived ~ age, family = binomial, data = titanic)
+
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-1.1189  -1.0361  -0.9768   1.3187   1.5162  
+
+Coefficients:
+             Estimate Std. Error z value Pr(&gt;|z|)  
+(Intercept) -0.136531   0.144715  -0.943   0.3455  
+age         -0.007899   0.004407  -1.792   0.0731 .
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 1414.6  on 1045  degrees of freedom
+Residual deviance: 1411.4  on 1044  degrees of freedom
+  (263 observations deleted due to missingness)
+AIC: 1415.4
+
+Number of Fisher Scoring iterations: 4</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb146"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb146-1"><a href="#cb146-1" aria-hidden="true" tabindex="-1"></a><span class="co"># pseudo R2 = </span></span>
+<span id="cb146-2"><a href="#cb146-2" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span> <span class="sc">-</span> <span class="fl">1411.4</span><span class="sc">/</span><span class="fl">1414.6</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.002262124</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb148"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb148-1"><a href="#cb148-1" aria-hidden="true" tabindex="-1"></a>fit2 <span class="ot">&lt;-</span> <span class="fu">glm</span>(survived <span class="sc">~</span> age <span class="sc">+</span> sex <span class="sc">+</span> <span class="fu">factor</span>(pclass), <span class="at">data =</span> titanic, <span class="at">family =</span> binomial)</span>
+<span id="cb148-2"><a href="#cb148-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+glm(formula = survived ~ age + sex + factor(pclass), family = binomial, 
+    data = titanic)
+
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-2.6399  -0.6979  -0.4336   0.6688   2.3964  
+
+Coefficients:
+                    Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept)         3.522074   0.326702  10.781  &lt; 2e-16 ***
+age                -0.034393   0.006331  -5.433 5.56e-08 ***
+sexmale            -2.497845   0.166037 -15.044  &lt; 2e-16 ***
+factor(pclass)2.Kl -1.280570   0.225538  -5.678 1.36e-08 ***
+factor(pclass)3.Kl -2.289661   0.225802 -10.140  &lt; 2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 1414.62  on 1045  degrees of freedom
+Residual deviance:  982.45  on 1041  degrees of freedom
+  (263 observations deleted due to missingness)
+AIC: 992.45
+
+Number of Fisher Scoring iterations: 4</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb150"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb150-1"><a href="#cb150-1" aria-hidden="true" tabindex="-1"></a><span class="co"># pseudo R2 = </span></span>
+<span id="cb150-2"><a href="#cb150-2" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span> <span class="sc">-</span> <span class="fl">982.45</span><span class="sc">/</span><span class="fl">1414.6</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.3054927</code></pre>
+</div>
+</div>
+</section>
+<section id="modellvergleich" class="level3">
+<h3 class="anchored" data-anchor-id="modellvergleich">Modellvergleich</h3>
+<p>Vergleich der Modelle entweder mit AIC oder ANOVA</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb152"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb152-1"><a href="#cb152-1" aria-hidden="true" tabindex="-1"></a><span class="fu">AIC</span>(fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1415.383</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb154"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb154-1"><a href="#cb154-1" aria-hidden="true" tabindex="-1"></a><span class="fu">AIC</span>(fit2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 992.4531</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb156"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb156-1"><a href="#cb156-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(fit, fit2, <span class="at">test =</span> <span class="st">"Chisq"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Analysis of Deviance Table
+
+Model 1: survived ~ age
+Model 2: survived ~ age + sex + factor(pclass)
+  Resid. Df Resid. Dev Df Deviance  Pr(&gt;Chi)    
+1      1044    1411.38                          
+2      1041     982.45  3   428.93 &lt; 2.2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb158"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb158-1"><a href="#cb158-1" aria-hidden="true" tabindex="-1"></a><span class="co"># test fuer jeden Parameter einzeln</span></span>
+<span id="cb158-2"><a href="#cb158-2" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(fit2, <span class="at">test =</span> <span class="st">"Chisq"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Analysis of Deviance Table
+
+Model: binomial, link: logit
+
+Response: survived
+
+Terms added sequentially (first to last)
+
+               Df Deviance Resid. Df Resid. Dev Pr(&gt;Chi)    
+NULL                            1045    1414.62             
+age             1    3.238      1044    1411.38  0.07196 .  
+sex             1  310.044      1043    1101.34  &lt; 2e-16 ***
+factor(pclass)  2  118.886      1041     982.45  &lt; 2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+</section>
+</section>
 </section>
 <section id="woche-7" class="level1">
 <h1>Woche 7</h1>
+<p>Kein Code in der Vorlesung besprochen</p>
 </section>
 
 </main>

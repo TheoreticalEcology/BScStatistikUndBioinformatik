@@ -17,17 +17,32 @@ set.seed(123)
 
 ## Einführung R
 
+R als Taschenrechner
+
 ```{r}
 2+2
 sqrt(5)
+```
+
+Grafiken erstellen in R
+
+```{r}
+curve(exp, 0, 5)
 barplot(c(1,2,3))
+```
 
+Variablen erstellen in R
+
+```{r}
 var1 = 5
-var1 = c(1,2,3)
-var2 = factor(c("rot", "gruen", "blau"))
-
+var1 = c(1,2,3,4)
+str(var1)
 mean(var1)
+
+var2 = factor(c("rot", "gruen", "blau","rot"))
+str(var2)
 mean(var2)
+table(var2)
 
 dat = data.frame(var1 = var1, var2 = var2)
 dat$var1
@@ -35,6 +50,7 @@ str(dat)
 
 # das ist ein Kommentar
 # Hilfe von Funktionen über ?name oder Maus auf Funktion und F1 drücken
+# Mehr Hilfe im Internet oder KI 
 ```
 
 ## Zentraler Grenzwertsatz
@@ -49,7 +65,15 @@ hist(y, breaks = 50)
 
 ## Beispiel deskriptive Statistik mit realen Daten
 
-Hier benutzen wir Daten der Passigierliste der Titanic. Die Daten sind im EcoData package enthalten. Um das EcoData package zu installieren, folgen Sie den Anweisungen [hier](https://theoreticalecology.github.io/AdvancedRegressionModels/1A-GettingStarted.html#libraries-that-you-will-need)
+Um unseren ersten echten Datensatz zu untersuchen benutzen wir Daten der Passigierliste der Titanic. Die Daten sind im EcoData package enthalten. Um das EcoData package zu installieren, führen Sie den folgenden Code aus:
+
+```{r, eval = FALSE}
+install.packages("devtools")
+devtools::install_github(repo = "TheoreticalEcology/EcoData",
+                         dependencies = F, build_vignettes = T)
+```
+
+Jetzt sollten Sie das Package laden und auf die Daten zugreifen können
 
 ```{r}
 library(EcoData)
@@ -80,8 +104,19 @@ boxplot(titanic$age)
 # um moments zu installieren tippen Sie install.packages("moments")
 library(moments)
 skewness(titanic$age, na.rm = T)
-
 ```
+
+Außerdem hier oeinen Datensatz des Sozio-oekonomischen Panels, welches Informationen über die deutschen Haushalte sammelt.
+
+```{r}
+x = EcoData::soep$einkommenj1 # Haupteinkommen der Haushalte
+hist(x)
+mean(x)
+median(x)
+boxplot(x)
+```
+
+Wenn Sie motiviert sind können Sie als Übung versuchen, weitere Kennzahlen dieser Variable oder anderer Variablen in diesem Datensatz zu erstellen.
 
 # Woche 2
 
@@ -402,7 +437,7 @@ curve(plogis, -4,4)
 plogis(-0.136531)
 ```
 
-## Poisson Regression 
+## Poisson Regression
 
 ```{r}
 plot(feeding ~ attractiveness, data = birdfeeding)

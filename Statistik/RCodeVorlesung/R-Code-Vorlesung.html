@@ -108,7 +108,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </ul></li>
   <li><a href="#woche-5" id="toc-woche-5" class="nav-link" data-scroll-target="#woche-5">Woche 5</a>
   <ul class="collapse">
-  <li><a href="#modellselection" id="toc-modellselection" class="nav-link" data-scroll-target="#modellselection">Modellselection</a>
+  <li><a href="#modellselektion" id="toc-modellselektion" class="nav-link" data-scroll-target="#modellselektion">Modellselektion</a>
   <ul class="collapse">
   <li><a href="#anova" id="toc-anova" class="nav-link" data-scroll-target="#anova">ANOVA</a></li>
   <li><a href="#aic" id="toc-aic" class="nav-link" data-scroll-target="#aic">AIC</a></li>
@@ -439,11 +439,8 @@ Allison, Mr. Hudson Joshua Crei       no   male 30.0000            1st
 Allison, Mrs. Hudson J C (Bessi       no female 25.0000            1st
 Anderson, Mr. Harry                  yes   male 48.0000            1st</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="fu">View</span>(TitanicSurvival)</span>
-<span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb61-4"><a href="#cb61-4" aria-hidden="true" tabindex="-1"></a>kreuz <span class="ot">=</span> <span class="fu">table</span>(TitanicSurvival<span class="sc">$</span>sex, TitanicSurvival<span class="sc">$</span>passengerClass)</span>
-<span id="cb61-5"><a href="#cb61-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(kreuz)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a>kreuz <span class="ot">=</span> <span class="fu">table</span>(TitanicSurvival<span class="sc">$</span>sex, TitanicSurvival<span class="sc">$</span>passengerClass)</span>
+<span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(kreuz)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>        
          1st 2nd 3rd
@@ -499,8 +496,14 @@ Anderson, Mr. Harry                  yes   male 48.0000            1st</code></p
 </figure>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">7</span>, <span class="dv">5</span>, <span class="dv">3</span>, <span class="dv">1</span>))</span>
-<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a><span class="fu">boxplot</span>(age<span class="sc">~</span>passengerClass<span class="sc">+</span>sex, <span class="at">data =</span> TitanicSurvival, <span class="at">notch =</span> <span class="cn">TRUE</span>, <span class="at">las =</span> <span class="dv">2</span>, <span class="at">xlab =</span> <span class="st">""</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Schöner mit Beeswarm </span></span>
+<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb68-3"><a href="#cb68-3" aria-hidden="true" tabindex="-1"></a><span class="fu">boxplot</span>(age<span class="sc">~</span>passengerClass, <span class="at">data =</span> TitanicSurvival, <span class="at">notch =</span> <span class="cn">TRUE</span>, <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">100</span>))</span>
+<span id="cb68-4"><a href="#cb68-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(beeswarm)</span>
+<span id="cb68-5"><a href="#cb68-5" aria-hidden="true" tabindex="-1"></a><span class="fu">beeswarm</span>(age<span class="sc">~</span>passengerClass, <span class="at">data =</span> TitanicSurvival,</span>
+<span id="cb68-6"><a href="#cb68-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">add =</span> T, <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">cex =</span> <span class="fl">0.5</span>)</span>
+<span id="cb68-7"><a href="#cb68-7" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, <span class="fu">rep</span>(<span class="dv">90</span>,<span class="dv">3</span>), </span>
+<span id="cb68-8"><a href="#cb68-8" aria-hidden="true" tabindex="-1"></a>     <span class="fu">paste</span>(<span class="st">"n="</span>, <span class="fu">table</span>(TitanicSurvival<span class="sc">$</span>passengerClass)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -1053,7 +1056,8 @@ F-statistic: 47.94 on 5 and 1040 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
 <p>Beispiel kontinuierlich</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb132"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb132-1"><a href="#cb132-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(loght <span class="sc">~</span> lat  , <span class="at">data =</span> plantHeight)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb132"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb132-1"><a href="#cb132-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(EcoData)</span>
+<span id="cb132-2"><a href="#cb132-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(loght <span class="sc">~</span> lat  , <span class="at">data =</span> plantHeight)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -1117,8 +1121,9 @@ Multiple R-squared:  0.2842,    Adjusted R-squared:  0.2714
 F-statistic: 22.24 on 3 and 168 DF,  p-value: 3.556e-12</code></pre>
 </div>
 </div>
-<section id="modellselection" class="level2">
-<h2 class="anchored" data-anchor-id="modellselection">Modellselection</h2>
+<section id="modellselektion" class="level2">
+<h2 class="anchored" data-anchor-id="modellselektion">Modellselektion</h2>
+<p>Methoden der Modellselektion befassen sich damit</p>
 <section id="anova" class="level3">
 <h3 class="anchored" data-anchor-id="anova">ANOVA</h3>
 <div class="cell">

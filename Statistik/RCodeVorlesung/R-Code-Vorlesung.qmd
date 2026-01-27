@@ -126,9 +126,6 @@ Wenn Sie motiviert sind können Sie als Übung versuchen, weitere Kennzahlen die
 library(effects)
 head(TitanicSurvival)
 
-View(TitanicSurvival)
-
-
 kreuz = table(TitanicSurvival$sex, TitanicSurvival$passengerClass)
 print(kreuz)
 
@@ -152,8 +149,15 @@ boxplot(age~passengerClass, data = TitanicSurvival)
 ## Mit Notch
 boxplot(age~passengerClass, data = TitanicSurvival, notch = TRUE)
 
-par(mar = c(7, 5, 3, 1))
-boxplot(age~passengerClass+sex, data = TitanicSurvival, notch = TRUE, las = 2, xlab = "")
+## Schöner mit Beeswarm 
+
+boxplot(age~passengerClass, data = TitanicSurvival, notch = TRUE, ylim = c(0,100))
+library(beeswarm)
+beeswarm(age~passengerClass, data = TitanicSurvival,
+         add = T, pch = 16, cex = 0.5)
+text(1:3, rep(90,3), 
+     paste("n=", table(TitanicSurvival$passengerClass)))
+
 ```
 
 ## Numerisch vs numerisch
@@ -380,6 +384,7 @@ plot(allEffects(fit))
 Beispiel kontinuierlich
 
 ```{r}
+library(EcoData)
 plot(loght ~ lat  , data = plantHeight)
 plot(loght ~ NPP  , data = plantHeight)
 
@@ -390,7 +395,9 @@ fit <- lm(loght ~ lat + NPP + temp , data = plantHeight)
 summary(fit)
 ```
 
-## Modellselection
+## Modellselektion
+
+Methoden der Modellselektion befassen sich damit
 
 ### ANOVA
 

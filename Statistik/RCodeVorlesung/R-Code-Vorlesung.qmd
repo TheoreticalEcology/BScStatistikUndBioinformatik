@@ -45,22 +45,12 @@ mean(var2)
 table(var2)
 
 dat = data.frame(var1 = var1, var2 = var2)
-dat$var1
 str(dat)
+dat$var1
 
 # das ist ein Kommentar
 # Hilfe von Funktionen über ?name oder Maus auf Funktion und F1 drücken
 # Mehr Hilfe im Internet oder KI 
-```
-
-## Zentraler Grenzwertsatz
-
-```{r}
-x = rlnorm(500)
-hist(x, breaks = 50)
-
-y = replicate(2000,mean(rlnorm(2000)))
-hist(y, breaks = 50)
 ```
 
 ## Beispiel deskriptive Statistik mit realen Daten
@@ -81,6 +71,7 @@ library(EcoData)
 str(titanic)
 
 titanic$pclass = factor(titanic$pclass)
+
 x = table(titanic$pclass)
 x
 barplot(x)
@@ -118,6 +109,18 @@ boxplot(x)
 
 Wenn Sie motiviert sind können Sie als Übung versuchen, weitere Kennzahlen dieser Variable oder anderer Variablen in diesem Datensatz zu erstellen.
 
+## Zentraler Grenzwertsatz
+
+```{r}
+x = rlnorm(500)
+hist(x, breaks = 50)
+
+y = replicate(2000,mean(rlnorm(2000)))
+hist(y, breaks = 50)
+```
+
+## 
+
 # Woche 2
 
 ## Kategorisch vs kategorisch
@@ -136,6 +139,7 @@ kreuz = table(TitanicSurvival$passengerClass, TitanicSurvival$sex)
 barplot(kreuz, beside = TRUE)
 
 mosaicplot(kreuz)
+heatmap(as.matrix(kreuz), scale="none")
 ```
 
 ## Kategorisch vs numerisch
@@ -177,10 +181,43 @@ cor.test(iris$Sepal.Length, iris$Petal.Length, method = "pearson")
 
 ```
 
-## PCA
+## PCA (Hauptkomponentenanalyse)
+
+Die PCA wird berechnet mit dem Kommando prcomp.
+
+Wie in der Vorlesung erklärt dreht die PCA das Koordinatensystem der Daten mit dem Ziel möglichst viel der multivariaten Varianz auf den ersten Achsen zu erklären. Die Option scale = T skaliert vorher alle Variablen, indem sie durch die Standardabweichung teilt. Das ist zu empfehlen, weil die PCA versucht die meiste Varianz auf die ersten Achsen zu bekommen, und ohne skalieren würde eine Variable mit mehr Varianz dann mehr Gewicht bekommen.
+
+```{r}
+pca = prcomp(iris[,1:4], scale = TRUE)
+```
+
+Wenn man sich die Rotationsmatrix der Koordinaten explizit anschauen will, kann man das machen durch:
+
+```{r, eval = F}
+pca$rotation
+```
+
+Eine PCA ist erfolgreich, wenn die vorderen Achsen mehr Variabilität erklären als die hinteren. Um das zu checken können wir uns anschauen, wie viel Variabilität von den verschiedenen Achsen erklärt wird (die so-genannten "Loadings"), entweder über Zahlen oder über einen plot
+
+```{r}
+summary(pca)
+plot(pca)
+```
+
+Wenn wir zufrieden mit den Loadings sind, d.h. wenn wir uns überzeugt haben, dass die ersten Achsen die Daten gut beschreiben, können wir uns die Daten in bezüglich dieses Koordinatensystems anschauen. Ein gebräuchliches Vorgehen ist die Daten in den ersten 2 Achsen in einen sogenannten Biplot anzuschauen. Hierbei wird jeder Datenpunkt im durch PC1 und PC2 aufgespannten Raum platziert, und die Beziehung zum ursprünglichen Koordinatensystem wird durch (in diesem Fall rote) Pfeile dargestellt.
+
+```{r}
+biplot(pca)
+```
+
+In diesem Fall sehen wir z.B., dass PCI positiv mit den Petal Traits sowie etwas geringer mit der Sepal Länge korreliert ist. Daraus können wir schlißen, dass diese Variablen auch im ursprünglichen Datensatz korreliert sein müssen (Sie können das ja auch noch mal checken). Die Sepal Weite ist dagegen eher mit PC2 assoziiert, was uns sagt dass sie wahrscheinlich weniger stark mit den anderen 3 Variablen korreliert ist.
+
+Als nächstes eine weitere PCA eines Datensatzes von Luftqualitätmessungen in New York - überprüfen Sie doch mal selbst, ob Sie die PCA richtig interpretieren können.
 
 ```{r}
 pca = prcomp(airquality[complete.cases(airquality),1:4], scale = TRUE)
+summary(pca)
+plot(pca)
 biplot(pca)
 ```
 
@@ -220,6 +257,16 @@ Ansonsten Chi2 Test
 chisq.test(x)
 ```
 
+Poweranalyse. Die Funktion ist leider nur für den Vergleich von Proportionen von 2 Gruppen vorgesehen.
+
+```{r}
+power.prop.test(n = 1000, 
+                p1 = 0.2, 
+                p2 = 0.25)
+```
+
+Für komplexere Poweranalysen muss mal sich spezielle R packages laden. 
+
 ## Tests auf Unterschiede im Mittelwert von 2 Gruppen (kat + num)
 
 Wir schauen uns an die Altersunterschiede zwischen Geschlechtern
@@ -258,6 +305,14 @@ Hier als Beispiel noch mal das gleiche mit einem t-Test, den wir aber aufgrund d
 t.test(titanic$age[titanic$sex == "female"],
             titanic$age[titanic$sex == "male"])
 ```
+
+Poweranalyse
+
+```{r}
+power.t.test(n = 20, delta = 1, sd = 10)
+```
+
+
 
 ## Tests auf Korrelation (num + num)
 

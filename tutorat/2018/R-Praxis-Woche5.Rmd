@@ -1,0 +1,228 @@
+---
+title: "Woche 5 - Multiple Regression"
+author: "Florian Hartig"
+date: "10/24/2018"
+output:
+  html_document:
+    df_print: paged
+editor_options:
+  chunk_output_type: console
+---
+
+```{r global_options, include=FALSE}
+Sys.setlocale("LC_ALL", "de_DE.UTF-8")
+knitr::opts_chunk$set(fig.width=5, fig.height=5)
+```
+
+
+# Ihr Datensatz
+
+Daten einlesen
+
+```{r}
+# Sys.setlocale("LC_ALL", "de_DE.UTF-8")
+daten = read.csv("../Woche1/Biostatistik Umfrage2.csv", encoding = "UTF-8")
+colnames(daten) = c("Zeit", "Einwohner", "Distanz", "Größe", "Gewicht", "Studium", 
+                    "Wohnung", "Geschlecht", "Hand", "Augen", "Transport", "Getraenk", "Vegetarier")
+```
+
+
+Schauen wir uns doch direkt mal die Abhängigkeit von Gewicht / Getränk an 
+
+```{r}
+boxplot(Größe ~ Getraenk , data = daten)
+```
+
+```{r}
+fit = lm(Größe ~ Getraenk , data = daten)
+summary(fit)
+```
+
+Aha, Weintrinker sind kleiner, und die Größten sind sowieso die Biertrinker. Oder war da was? Sie erinnern sich vielleicht, dass die Wahl der Getränke sehr unterschiedlich war, je nach Geschlecht. 
+
+```{r}
+barplot(table(daten$Geschlecht, daten$Getraenk))
+```
+
+Und natürlich ist das Geschlect auch ein Prädiktor für das Gewicht. Es könnte sich hier also um Scheinkorrelationen handeln. Dann rechnen wir doch mal die multiple Regression
+
+```{r}
+fit = lm(Größe ~ Getraenk + Geschlecht , data = daten)
+summary(fit)
+```
+
+Visualisierung
+
+```{r, fig.width=9}
+library(effects)
+plot(allEffects(fit))
+```
+
+
+Aha, die Größe hängt nur von Geschlecht hab, das Getränk ist in der Tat völlig egal. Tut mir leid für die Biertrinker!
+
+
+
+## Multiple Regression Komplettes Analysebeispiel
+
+Hier benutzen wir den Datensatz boys aus dem package mice. Die Daten fassen Körpereigenschaften (hgt = Größe, hc = Kopfumfang, wgt = Gewicht, age = Alter) von niederländischen Jungen zusammen. Wir interessieren uns hier dafür, wie die Körpergröße mit den anderen Variablen zusammenhängt. Hier ein paar mögliche Modelle
+
+
+```{r}
+library(mice)
+plot(hgt ~ wgt , data = boys)
+fit = lm(hgt ~ wgt , data = boys, na.action = "na.exclude")
+summary(fit)
+
+fit = lm(hgt ~ wgt + age + hc , data = boys, na.action = "na.exclude")
+summary(fit)
+
+fit = lm(hgt ~ wgt +  age + I(age^2) + hc , data = boys, na.action = "na.exclude")
+summary(fit)
+
+fit = lm(hgt ~ wgt * age + hc , data = boys, na.action = "na.exclude")
+summary(fit)
+```
+
+Visualisierung des letzten Modells
+
+```{r, fig.width=9}
+library(effects)
+plot(allEffects(fit))
+```
+
+Residuen wie gehabt
+
+```{r}
+par(mfrow = c(2,2))
+plot(fit)
+```
+
+Wir sehen hier leichte Abweichung von der Normalverteilung und Varianzheterogenität. Das müsste man eigentlich noch beheben bevor man das Modell publizieren kann! Ich habe mal ein bisschen mit der Fuktion rumgespielt, insbesondere die abhängige Variable log transformiert um die Varianzheterogenität wegzubekommen. 
+
+```{r}
+fit = lm(log(hgt) ~ wgt * age + sqrt(age) + sqrt(wgt) + hc, data = boys, na.action = "na.exclude")
+summary(fit)
+par(mfrow = c(2,2))
+plot(fit)
+```
+
+Damit sollte man schon arbeiten können.
+
+Außerdem: bei multipler Regression sollte man immer auch noch die Residuen einzeln gegen die Prädiktoren plotten, also z.B.
+
+```{r}
+plot(boys$wgt, residuals(fit))
+```
+
+um zu sehen, ob es ein Pattern gegen bestimmte Prädiktoren gibt
+
+## Multiple Regression und Anova
+
+```{r}
+library(mlbench)
+data(PimaIndiansDiabetes)
+head(PimaIndiansDiabetes)
+
+m1 <- lm(glucose ~ age , data = PimaIndiansDiabetes)
+summary(m1)
+
+m2 <- lm(glucose ~ age + mass + diabetes + triceps, data = PimaIndiansDiabetes)
+summary(m2)
+```
+
+Alle 4 Faktoren erklären 25% der Varianz in den Daten (r2 = 0.25)
+
+Wie wichtig sind die einzelnen Faktoren für den Glukoselevel - hierzu können wir eine Anova machen
+
+```{r}
+anova(m2)
+```
+
+Was die ANOVA macht, ist age + mass + diabetes + triceps zu nehmen, und mit dem ersten Faktor (age) anzufangen, und zu fragen: wie viel r2 erklärt age alleine? Das ist dann der Sum Sq Wert für Age (für R2 muss man dann noch duch die Gesamtvarianz = Summe aller Sum Sq Werte teilen). Es wäre ein bisschen komfortabler, wenn die ANOVA die Werte gleich geteilt durch die Gesamtvarianz anzeigen würde. 
+
+Ich rechne Ihnen hier noch mal die kummulative Summer der Sum Sq Werte / Summe( Sum Sq) - diese Werte entsprechen den R2 Werten der Modelle 
+
+```{r}
+x = anova(m2)
+rownames(x)
+format(x$`Sum Sq` / sum(x$`Sum Sq`), scientific = FALSE)
+cumsum(x$`Sum Sq` / sum(x$`Sum Sq`) )
+```
+
+
+
+```{r}
+anova(m1, m2)
+
+AIC(m1)
+AIC(m2)
+```
+
+## Automatische Modellselektion
+
+Welches Modell ist aber denn jetzt das richtige Modell für die Glukose - nehmen wir doch mal alle Variablen rein
+
+```{r}
+m3 <- lm(glucose ~ ., data = PimaIndiansDiabetes)
+summary(m3)
+```
+
+Aber das sind ja noch nicht richtig alle - hier das Modell mit allen Variable, und allen möglichen 2-Wege Interaktionen zwischen den Variablen
+
+```{r}
+m4 <- lm(glucose ~ .^2, data = PimaIndiansDiabetes)
+summary(m4)
+```
+
+Jetzt ist irgendwie fast gar nichts mehr signifikant, außer Insulin. Aber es sieht einfach so aus, also wir zu viele Variablen für unser Modell haben. Also machen wir eine automatische Modellselektion
+
+Schrittweise Selektion
+
+```{r}
+library(MASS)
+stepAIC(m4, trace = 0)
+```
+
+Das finale Modell ist: 
+
+lm(formula = glucose ~ pressure + triceps + insulin + mass + 
+    pedigree + age + diabetes + pressure:triceps + pressure:diabetes + 
+    triceps:insulin + insulin:mass + insulin:age + insulin:diabetes + 
+    mass:pedigree, data = PimaIndiansDiabetes)
+    
+Die Aussage von AIC ist jetzt: wenn Sie eine Vorhersage machen wollen, für die Glukosekonzentration in Abhängigkeit der Variable und ihrer 2-Wege Interaktionen, dann wird diese Modell wahrscheinlich den kleinsten möglichen Fehler unter allen möglichen Modelle haben
+
+
+## Typ I Fehler und Modellselektion
+
+Modellselektion ist eine super Sache, aber was man nicht darf ist auf dem selektierten Modell dann noch mal p-Werte berechnen, weil diese Berechnung nicht für das multiple Testen der Modellselektion korrigiert. 
+
+Beispiel: wir erzeugen völlig zufällige Daten, 100 Prädiktoren, und rechnen eine normale Regression
+
+
+```{r}
+set.seed(1)
+dat = data.frame(matrix(runif(20000), ncol = 100))
+dat$y = rnorm(200)
+fullModel = lm(y ~ . , data = dat)
+summary(fullModel)
+```
+
+2 von den 100 Prädiktoren sind signifikant. Das ist im Rahmen desssen, was wir normalerweise erwarten (5% Typ I Fehler). Jetzt rechnen wir eine Modellselektion, und dann ein neues lm für das beste Modell
+
+
+```{r}
+selection = stepAIC(fullModel, trace = 0)
+selection
+summary(lm(y ~ X1 + X2 + X3 + X5 + X7 + X13 + X20 + X23 + X30 + 
+             X37 + X42 + X45 + X46 + X47 + X48 + X64 + X65 + X66 + X71 + 
+             X75 + X80 + X81 + X87 + X88 + X89 + X90 + X94 + X100, data = dat))
+```
+
+Voila, 15 von 28 selektierten (der 100) Prädiktoren sind signifikant. Natürlich sieht das erst mal viel besser aus, aber machen Sie sich klar - keiner dieser Variablen hat einen Effekt. Wir haben unsere Statistik ausgetrickst, indem wir unerlaubterweise 2 Methoden kombiniert haben. 
+
+Es ist möglich korrekte p-Werte nach der Selektion zu errechnen aber das ist recht kompliziert. Wir behandeln die entsprechenden Methoden hier nicht. 
+
+
+

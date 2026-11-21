@@ -1,0 +1,336 @@
+---
+title: "Woche 3 - Hypothesentests"
+author: "Florian Hartig"
+date: "10/24/2018"
+output:
+  html_document:
+    df_print: paged
+editor_options:
+  chunk_output_type: console
+---
+
+```{r global_options, include=FALSE}
+Sys.setlocale("LC_ALL", "de_DE.UTF-8")
+knitr::opts_chunk$set(fig.width=5, fig.height=5)
+```
+
+
+# Grundkonzepte
+
+
+## Variabilität 
+
+Machen wir uns noch mal klar dass durch zufällige Variabilität Muster in Daten entstehen können die zwar aussehen wie ein Effekt, aber nicht systematisch sind. Hier das Beispiel eines Experimentes in dem der Erfolg eines Medikamentes getestet wurde. Es gibt 2 Gruppen, einmal die Kontrolle (kein Medikament), und zum zweiten die Behandlung. Ich habe den Zufallsgenerator aber so programmiert dass beide Gruppen den gleichen Behandlungserfolg haben. Trotzdem sehen ist der gemessene Erfolg in der Behandlungsgruppe höher
+
+
+```{r}
+set.seed(123)
+Daten = data.frame(Geheilt = rbinom(50, 1, 0.5), Behandlung = rep(c("Kontrolle", "Behandlung"), each = 25))
+x = table(Daten$Geheilt, Daten$Behandlung)
+barplot(x)
+```
+
+Wenn wir viele Computerexperiment machen sehen wir aber dass dass ein solches Ergebnis nicht außergewöhnlich ist, sondern im Rahmen der normal erwarteten Streuung einer solchen, relativ kleinen Stichprobe liegt. Wenn sie die folgende Animation zu Hause sehen wollen müssten Sie das in R laufen lassen.
+
+
+```{r, eval = F}
+library(animation)
+
+oopt = ani.options(interval = 0.5, nmax = 50)
+## use a loop to create images one by one
+for (i in 1:ani.options("nmax")) {
+    Daten = data.frame(Geheilt = rbinom(50, 1, 0.5), Behandlung = rep(c("Kontrolle", "Behandlung"), each = 25))
+    xn = table(Daten$Geheilt, Daten$Behandlung)
+    barplot(xn)
+    ani.pause()  ## pause for a while ('interval')
+}
+## restore the options
+ani.options(oopt)
+```
+
+## Hypothesentests
+
+Die Frage die wir uns also stellen wenn wir beobachtete Daten bekommen: zeigen diese einen eindeutigen systematische Effekt an, oder könnten die Daten genausogut durch Zufall entstanden sein?
+
+Hypothesentests beantworten diese Frage durch den folgenden Ansatz
+
+1. Wir denken uns erst mal ein Modell M für die Streuung der Daten aus
+2. Dann erstellen wir eine Nullhypothese H0, typischerweise dass es keine systematischen Effekte gibt und die Variabilität in den Daten nur durch die zufällige Streuung kommt die in M beschrieben wird (H0 beinhaltet M)
+3. Dann denken wir uns eine Teststatistik aus die den untersuchten Effekt beschreibt
+4. Jetzt benutzen wir H0 mit M und überlegen uns was wir für Werte für die Teststatistik erwarten würden wenn H0 wahr wäre - der p-Wert ist dann definiert als p(d >= D| M, H0), also die Wahrscheinlichkeit dass die beobachteten Daten D gleich oder größer sind als die Daten d die unter M, H0 erwartet werden. >= ist in Bezug auf die Teststatistik
+5. Wenn p < 0.05 wird sagen wir der Effekt ist signifikant, und wir können die Nullhypothese ablehnen
+
+## Beispiel Medikament
+
+Gehen wir das mal durch für unser Beispiel
+
+1. Modell ist das Binominialmodell - Münzwurf mit einer festen Wahrscheinlichkeit von Behandlungserfolg p
+2. H0: p ist identisch für Behandlung und Kontrolle
+3. Teststatistik: Unterschied in den Proportionen
+4. Wahrscheinlichkeit - die kann man exakt ausrechenen (wie gesagt, die Binominialformel war ja eigentlich Abistoff). In R bekommen Sie die Wahrscheinlichkeit mit der prop.test funktion
+5. Wenn es < 0.05 ist sagen wir es ist signifikant - dann schauen wir doch mal für die Daten oben 
+
+```{r}
+barplot(x)
+prop.test(x)
+```
+
+der p-Wert ist also 0.09 ... das ist ...
+
+Genau, nicht signifikant.
+
+Was sagt uns das?
+
+Richtige Antwort: ein signifikanter Effekt konnte nicht nachgewiesen werden. Das ist aber kein Beweis dafür dass kein Effekt da ist.
+
+Falsche Antwort: der p-Wert > 0.05, also sind wir sicher dass es keinen Effekt gibt. Merken Sie sich: wenn das Ergebnis nicht signifikant ist können Sie nichts sagen. 
+
+Wenn sie genau auf das Ergebnis schauen sehen Sie die Bemerkung "alternative hypothesis: two.sided" - das heißt dass der Test sowohl testet ob mit dem Medikament eventuell MEHR also auch WENIGER Patienten geheilt werden als in der Kontrolle. 
+
+Wenn Sie sicher sind dass das Medikament nur eine positive Wirkung haben kann könnten Sie die Nullhypothese auch genauer fassen und sagen sie wollen nur auf positive Abweichungen testen
+
+```{r}
+prop.test(x, alternative = "greater")
+```
+
+Jetzt wäre der Test signifikant. Das liegt daran dass wir eine spezifischere Nullhypothese testen. Man sagt der Einseitige Test hat eine größere Power. 
+
+**Vorsicht:** Jetzt könnten Sie doch denken: super, der einseitige Test hat mehr Power, dann mache ich es doch so: ich schaue mir erst mal die Daten an in welche Richtung der Effekt geht, und wenn ich sehe die Behandlung ist größer als die Kontrolle dann teste ich in die eine Richtung, und wenn die Behandlung kleiner ist dann teste ich in die andere - ** Das ist SEHR SEHR FALSCH ** - Wenn Sie ihre Nullhypothese gezielt auf die Daten anpassen können Sie immer signifikanz erzeugen. Sie können gerne einseitig testen, aber Sie müssen diese Entscheidung fällen bevor Sie sich die Daten angeschaut haben (darüber reden wir noch mal im Detail in der Vorlesung Versuchsdesign). 
+
+
+## Typ I Fehler 
+
+Ich wollte Ihnen noch mal zeigen dass es wiklich so ist das bei wiederholten Experimenten genau 5% falsche positive Entstehen - hier eine Wiederholung von 1000 Experimenten mit je 10.000 Teilnehmer, und einem Medikament dass keinen Effekt hat. Trotzdem entstehen 5% falsche positive.
+
+
+```{r}
+p = rep(NA, 1000)
+
+for (i in 1:1000){
+  Daten = data.frame(Geheilt = rbinom(10000, 1, 0.5), Behandlung = rep(c("Kontrolle", "Behandlung"), each = 5000))
+  xn = table(Daten$Geheilt, Daten$Behandlung)
+  test = prop.test(xn)
+  p[i] = test$p.value
+}
+hist(p, breaks = 100, main= "Histogramm der p-Werte")
+mean(p < 0.05) 
+```
+
+Was wir hier auch sehen: wenn H0 wahr ist, und wir immer wieder Experimente machen, dann ist die Verteilung der p-Werte uniform zwischen 0 und 1 (Selbststudium: kann man direkt an der Definition des p-Wertes ablesen / herleiten)
+
+
+## Power
+
+Wir hatten bei unserem Experiment ja keinen Effekt. Vielleicht lag es ja daran, dass wir nicht genug Samples hatten. Nehmen wir mal an der Effekt den wir gesehen hatten war echt - zur Erinnerung, das waren die Daten
+
+```{r}
+x
+```
+
+mit den Proportionen 
+
+```{r}
+prop.test(x)
+```
+
+wenn die Propotionen wirklich so wären, wie viele Daten bräuchte man denn um einen Effekt zu sehen? Das sagt uns die Poweranalyse. R hat dafür die funktion 
+
+```{r}
+power.prop.test(n = 25, p1 = 0.64, p2 = 0.36)
+```
+
+Mit unsere Stichprobengröße hatten wir als 50% power, d.h. 50% Wahrscheinlichkeit einen Effekt zu sehen (wenn 64/36 die wahren Propotionen sind, was man im Allgemeinen natürlich nicht weiß). Wie viele Daten bräuchten wir denn für 95% Power?
+
+```{r}
+power.prop.test(power = 0.95, p1 = 0.64, p2 = 0.36)
+```
+
+80 Beobachtugen pro Gruppe ... das ist natürlich deutlich mehr als wir hatten. Also, vielleicht hatten wir einfach nicht genug Daten. Man sagt dann: die Studie war "unterpowert".
+
+## False Discovery Rate FDR
+
+Stellen Sie sich vor wir testen 1000 Wirkstoffe gegen Krebs mit unserer vorherigen Stichprobengröße (n = 25). Nehmen wir mal an dass 90% der Mittel nicht wirken, aber wenn sie wirken dann bewirken sie eine Heilungsrate von 85%, gegenüber 75% ohne das Medikament. Sie testen ihren ersten Wirkstoff und er kommt signifikant zurück. Was ist die Wahrscheinlichkeit, dass er wirklich wirkt?
+
+Antwort: rechen wir erst mal die Power aus:
+
+```{r}
+power.prop.test(n = 25, p1 = 0.85, p2 = 0.75)
+```
+
+Power ist 14%. Also, 14% der Stoffe die wirklich wirken kommen signifikant zurück, aber auch 5% der Stoffe die nicht wirken. Leider gibt es viel mehr Stoffe die nicht wirken. Also ist die Wahrscheinlichkeit dass ihr signifikantes Ergebnis in wirklichkeit eine "Niete" ist
+
+```{r}
+0.05*0.9 / (0.05*0.9  + 0.139*0.1)
+```
+
+Wenn uns diese False discovery rate zu hoch ist, haben wir 2 Möglichkeiten. Welche?
+
+1. Stichprobengröße erhöhen, das erhöht die Power
+2. Siginfikanzlevel verringert, das verringert die falschen Positiven
+
+
+# Multiples Testen
+
+Das folgende Beispiel habe ich von https://web.stanford.edu/class/bios221/labs/multi/lab_multtest.html - Es geht um eine Gen Expressionsstudie, in der man Leukemiegene identifizieren will. 
+Gene expression data (3051 genes and 38 tumor mRNA samples) from the leukemia microarray study of Golub et al. (1999). Pre-processing was done as described in Dudoit et al. (2002). The R code for pre-processing is available in the file ../doc/golub.R.
+
+Datensätze:
+
+* golub - matrix of gene expression levels for the 38 tumor mRNA samples, rows correspond to genes (3051 genes) and columns to mRNA samples.
+
+* golub.cl - numeric vector indicating the tumor class, 27 acute lymphoblastic leukemia (ALL) cases (code 0) and 11 acute myeloid leukemia (AML) cases (code 1).
+
+* golub.gnames - a matrix containing the names of the 3051 genes for the expression matrix golub. The three columns correspond to the gene index, ID, and Name, respectively.
+
+
+```{r}
+# Package installieren
+# if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
+# BiocManager::install("multtest", version = "3.8")
+
+library(multtest)
+data(golub)
+```
+
+Etwas kryptisch, aber so geht es am kürzesten p-Werte für jedes Gen auszurechnen
+
+```{r}
+rawp = 2 * (1 - pnorm(abs(mt.teststat(golub, golub.cl, test="t"))))
+hist(rawp)
+```
+
+
+```{r}
+procedures = c("Bonferroni", "Holm", "Hochberg", "SidakSS", "SidakSD", "BH", 
+    "BY")
+adjusted = mt.rawp2adjp(rawp, procedures)
+
+rownames(adjusted$adjp) = golub.gnames[adjusted$index,2]
+adjusted$adjp[1:10, ]
+```
+
+
+# Ihr Datensatz
+
+Daten einlesen
+
+```{r}
+# Sys.setlocale("LC_ALL", "de_DE.UTF-8")
+daten = read.csv("../Woche1/Biostatistik Umfrage2.csv", encoding = "UTF-8")
+colnames(daten) = c("Zeit", "Einwohner", "Distanz", "Größe", "Gewicht", "Studium", 
+                    "Wohnung", "Geschlecht", "Hand", "Augen", "Transport", "Getraenk", "Vegetarier")
+```
+
+
+## Kategoriale Assoziationen  
+
+Fangen wir mit kategorialen Assoziationen  an - ein beliebtes Vorurteil ist ja, dass Frauen eher Vegetarier sind. Das wollen wir uns jetzt mal anschauen.
+
+
+```{r}
+tab = table(daten$Vegetarier, daten$Geschlecht)
+tab
+barplot(tab, beside = T)
+```
+
+Bestätigt das jetzt unser Vorurteil? Vielleicht, aber um sicher zu sein, dass das kein Zufall ist bräuchten wir jetzt wieder die schließende Statistik.
+
+```{r}
+prop.test(tab)
+```
+
+
+Schauen wir doch mal auf das Getränk
+
+```{r}
+tab = table(daten$Getraenk, daten$Geschlecht)
+tab
+barplot(tab, beside = F, las = 2)
+legend("topleft", legend = levels(daten$Getraenk), col = grey.colors(5), pch = 18)
+```
+
+aha, Männer und Bier ... stimmt also doch, oder? Nein, wieder Vorsicht, für allgemeine Schlüsse brauchen wir die schließende Statistik
+
+
+```{r}
+prop.test(tab)
+```
+
+
+## Die Assoziazion kat + num
+
+```{r}
+boxplot(Größe ~ Geschlecht, data = daten)
+```
+
+Die t.test Funktion geht entweder indem man die 2 Gruppen übergibt (t.test(A,B)), oder mit einer Formel so wie ein Boxplot - hier einfacher, weil wir das ja schon so vorliegen haben
+
+```{r}
+t.test(Größe ~ Geschlecht, data = daten)
+```
+
+Was gibt es denn noch so?
+
+```{r}
+boxplot(Gewicht ~ Vegetarier, data = daten)
+```
+
+```{r}
+t.test(Gewicht ~ Vegetarier, data = daten)
+```
+
+OK, aber wenn Sie schlau sind sagen Sie jetzt auch gleich wieder Scheinkorrelation, also schauen wir uns mal nur die Frauen an
+
+```{r}
+boxplot(Gewicht ~ Vegetarier, data = daten[daten$Geschlecht == "Weiblich",])
+```
+
+```{r}
+t.test(Gewicht ~ Vegetarier, data = daten[daten$Geschlecht == "Weiblich",])
+```
+
+## Korrelation
+
+```{r}
+# syntax plot(y ~ x)
+plot(Einwohner ~ Distanz, data = daten)
+# alternative syntax plot(x, y)
+# plot(daten$Distanz, daten$Einwohner)
+```
+
+Rechnen wir doch mal Korrelationen aus
+
+```{r}
+cor(daten$Distanz, daten$Einwohner) # Pearson ist der default
+cor(daten$Distanz, daten$Einwohner, method = "kendall")
+```
+
+Die default Methode ist Pearson, d.h. wenn wir nichts machen rechnet er die lineare Korrelation nach Pearson. 
+
+Warum unterscheiden sich die Werte so stark? Genau, weil Pearson extrem sensibel auf Ausreißer reagiert. 
+
+Man sieht ja auch gar nicht richtig was hier in den Daten passiert, wegen diesen 2 großen Werten. Warum loggen wir die Daten nicht einfach mal. 
+
+```{r}
+plot(log(Einwohner) ~ log(Distanz + 1), data = daten)
+cor(log(daten$Distanz + 1), log(daten$Einwohner))
+cor(log(daten$Distanz + 1), log(daten$Einwohner), method = "kendall")
+
+```
+
+Merken Sie, dass der Pearson Wert jetzt viel kleiner geworden ist? Wie gesagt, Pearson reagiert auf Transformationen der Daten
+
+Der Kendall Wert ist gleich geblieben - Rangkorrelationen reagieren nicht auf Transformationen. 
+
+```{r}
+cor.test(daten$Distanz, daten$Einwohner) # Pearson ist der default
+cor.test(daten$Distanz, daten$Einwohner, method = "kendall")
+ ```
+
+
+
+
+
+
+
+

@@ -1,0 +1,689 @@
+---
+title: "R Code der Vorlesung BSc Statistik und Bioinformatik"
+author: "Florian Hartig"
+abstract: "Dieses Dokument fasst den in der Vorlesung live vorgeführten R Code zusammen und erklärt zu jedem Block kurz, was passiert und wie die Ausgabe zu lesen ist. Wichtig: es handelt sich hier um eine Sammlung von Code mit Anmerkungen, nicht um ein Lehrbuch. Insbesondere kann dieses Dokument die in der Vorlesung gegebene mündliche Erklärung der Motivation / Outputs nicht ersetzen. Bezüglich letzterer verweise ich auf Ihre Mitschriften, die Vorlesungsunterlagen und das Skript."
+format:
+  html:
+    toc: true
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, echo=F}
+set.seed(123)
+```
+
+## Hinweise zur Benutzung {.unnumbered}
+
+Der Code ist in der Reihenfolge der Vorlesung geordnet (Woche 1 bis 7) und baut teilweise aufeinander auf: Datensätze, die in einer früheren Woche aufbereitet wurden (z.B. `titanic` mit seinen `factor`-Labels aus Woche 3), werden später weiterverwendet. Wenn Sie nur einen Abschnitt ausführen, führen Sie die Aufbereitung am Anfang der jeweiligen Woche (bzw. der Woche davor) mit aus. Wichtiger als den Code auswendig zu können ist es, die Ausgaben lesen und interpretieren zu können.
+
+Zusätzlich zu `EcoData` (Installation siehe Woche 1) benötigen Sie diese Packages (einmalig installieren):
+
+```{r w0-install-packages, eval = FALSE}
+install.packages(c("moments", "effects", "beeswarm"))
+```
+
+Die Ausgaben hier sind Beispiele. Zufallszahlen (Woche 1 und die Stichprobe in Woche 3) sind nur reproduzierbar, wenn das ganze Dokument von oben nach unten läuft (`set.seed(123)` am Anfang); sonst sehen Sie leicht andere Zahlen und Abbildungen.
+
+# Woche 1 - Univariate deskriptive Statistik {#woche-1}
+
+## Einführung R
+
+R funktioniert zunächst wie ein wissenschaftlicher Taschenrechner. Funktionen wie `sqrt()` haben immer die Struktur `funktion(argument)`.
+
+```{r w1-taschenrechner}
+2+2
+sqrt(5)
+```
+
+Zusätzlich zu Zahlen kann R Grafiken erstellen: `curve()` zeichnet eine Funktion, `barplot()` ein Säulendiagramm.
+
+```{r w1-curve-barplot}
+curve(exp, 0, 5)
+barplot(c(1,2,3))
+```
+
+Damit man Daten nicht immer wieder eintippen muss, speichert man sie in Variablen (Zuweisung mit `=` oder `<-`; `c()` fasst Werte zu einem Vektor zusammen; erneutes Zuweisen überschreibt, hier `var1`). Jede Variable hat einen Typ (`str()`), der bestimmt, was sinnvoll berechenbar ist: der Mittelwert für numerische Variablen, nicht für kategoriale (`factor`; R gibt `NA` und eine Warnung). Für diese passt `table()`. Einen Datensatz (eine Zeile pro Beobachtung) speichert man in einem `data.frame`, einzelne Spalten erreicht man mit `$`.
+
+```{r w1-variablen}
+var1 = 5
+var1 = c(1,2,3,4)
+str(var1)
+mean(var1)
+
+var2 = factor(c("rot", "gruen", "blau","rot"))
+str(var2)
+mean(var2)
+table(var2)
+
+dat = data.frame(var1 = var1, var2 = var2)
+str(dat)
+dat$var1
+
+# das ist ein Kommentar
+# Hilfe von Funktionen über ?name oder Maus auf Funktion und F1 drücken
+# Mehr Hilfe im Internet oder KI
+```
+
+## Beispiel deskriptive Statistik mit realen Daten
+
+Um unseren ersten echten Datensatz zu untersuchen, benutzen wir Daten der Passagierliste der Titanic. Die Daten sind im EcoData package enthalten. Um das EcoData package zu installieren, führen Sie den folgenden Code aus:
+
+```{r w1-install-ecodata, eval = FALSE}
+install.packages("devtools")
+devtools::install_github(repo = "TheoreticalEcology/EcoData",
+                         dependencies = F, build_vignettes = T)
+```
+
+Jetzt sollten Sie das Package laden und auf die Daten zugreifen können. Der erste Blick auf einen neuen Datensatz ist immer `str()`: Wie viele Beobachtungen und Variablen gibt es, welchen Typ hat R jeder Variable zugewiesen? Die Passagierklasse `pclass` wurde als Zahl (`int`) eingelesen, obwohl sie eine Kategorie ist, deshalb wandeln wir sie in einen `factor` um. Für kategoriale Variablen sind `table()` (Häufigkeiten) und `barplot()` die passende Kennzahl und Abbildung.
+
+```{r w1-titanic-str-barplot}
+library(EcoData)
+
+str(titanic)
+
+titanic$pclass = factor(titanic$pclass)
+
+x = table(titanic$pclass)
+x
+barplot(x)
+barplot(x, las = 2, horiz = T, col = c("darkred"))
+
+x = table(titanic$sex)
+x
+barplot(x)
+```
+
+Für die numerische Variable `age` ist die Standardabbildung das Histogramm. Mit eckigen Klammern wählt man Teile der Daten aus: `titanic$age[titanic$pclass == 3]` ist das Alter der Passagiere der 3. Klasse. `na.rm = T` ist nötig, weil bei einem Teil der Passagiere das Alter fehlt (`NA`). Mittelwert (ca. 29.9) und Median (28) liegen nah beieinander, die leichte Rechtsschiefe zeigt die Schiefe (ca. 0.4). `var()` und `sd()` teilen durch N-1 (korrigierte Stichprobenvarianz). Der Boxplot zeigt Median und Quartile, Punkte jenseits der Whisker (1.5 · Interquartilsabstand) sind Ausreißer.
+
+```{r w1-titanic-kennzahlen}
+hist(titanic$age)
+hist(titanic$age[titanic$pclass == 3])
+
+mean(titanic$age, na.rm = T)
+median(titanic$age, na.rm = T)
+var(titanic$age, na.rm = T)
+sd(titanic$age, na.rm = T)
+
+quantile(titanic$age, na.rm = T)
+boxplot(titanic$age)
+
+# um moments zu installieren tippen Sie install.packages("moments")
+library(moments)
+skewness(titanic$age, na.rm = T)
+```
+
+Ein Datensatz des Sozio-oekonomischen Panels, das Informationen über deutsche Haushalte sammelt. Einkommen sind ein klassisches Beispiel für stark rechtsschiefe Daten: einzelne sehr hohe Einkommen ziehen den Mittelwert nach oben (hier auf mehr als das Doppelte des Medians), der Median bleibt stabil. Deshalb berichtet man bei Einkommen meist den Median.
+
+```{r w1-soep-einkommen}
+x = EcoData::soep$einkommenj1 # Haupteinkommen der Haushalte
+hist(x)
+mean(x)
+median(x)
+boxplot(x)
+```
+
+Wenn Sie motiviert sind, können Sie als Übung weitere Kennzahlen dieser oder anderer Variablen des Datensatzes erstellen.
+
+::: {.callout-note title="Grafiken exportieren und nachbearbeiten"}
+Grafiken aus RStudio können Sie über "Export" als Bild oder PDF speichern. Wichtigster Unterschied der Dateitypen: **Raster** (PNG, JPG, TIFF; Pixel, werden beim Vergrößern unscharf) vs. **Vektor** (PDF, SVG, EPS; geometrische Objekte, beliebig scharf; in der Wissenschaft heute meist PDF). Für Abschlussarbeit, Paper und Poster speichern Sie deshalb im Vektorformat: die Dateien sind meist kleiner und lassen sich nachträglich weiterbearbeiten (Beschriftungen ändern, Panels anordnen, Farben anpassen), z.B. mit Inkscape (Open Source), Affinity Designer (für Sie kostenlos, siehe Vorlesung) oder Adobe Illustrator.
+
+Reproduzierbarer als "Klicken und Exportieren" ist es, die Grafik direkt aus dem Code in eine Datei zu schreiben:
+
+```{r w1-export-pdf, eval = FALSE}
+pdf("meine_abbildung.pdf", width = 6, height = 4)  # Datei öffnen (Größe in Zoll)
+barplot(c(1,2,3))                                   # Grafik erzeugen
+dev.off()                                           # Datei schließen und speichern
+```
+
+:::
+
+## Zentraler Grenzwertsatz
+
+Mittelwerte aus vielen Beobachtungen streuen annähernd normalverteilt, auch wenn die Einzelwerte aus einer ganz anderen (z.B. schiefen) Verteilung stammen. Simulation: das erste Histogramm zeigt 500 Zufallszahlen aus der stark rechtsschiefen Lognormalverteilung. Dann wiederholen wir 2000-mal (`replicate`): ziehe 2000 Zufallszahlen und bilde ihren Mittelwert. Das Histogramm dieser 2000 Mittelwerte ist annähernd glockenförmig (es braucht genug Beobachtungen pro Mittelwert und genug Wiederholungen). Deshalb streuen auch viele statistische Größen (z.B. Schätzer, Woche 4) für große Stichproben normalverteilt.
+
+```{r w1-zgs-lognormal}
+x = rlnorm(500)
+hist(x, breaks = 50)
+
+y = replicate(2000,mean(rlnorm(2000)))
+hist(y, breaks = 50)
+```
+
+# Woche 2 - bivariate und multivariate deskriptive Statistik {#woche-2}
+
+## Kategorisch vs kategorisch
+
+Wir benutzen weiter den Titanic-Datensatz aus Woche 1. Die Assoziation zweier kategorialer Variablen beschreibt man durch eine Kreuztabelle: `table()` mit zwei Variablen zählt die Passagiere pro Kombination aus Geschlecht und Klasse, die Summen in Zeilen- bzw. Spaltenrichtung (Randsummen) sind wieder die einfachen Tabellen. Welche Darstellung besser ist, hängt davon ab, was Sie hervorheben wollen: das gestapelte Säulendiagramm (Standard) betont die Randsummen der Variable auf der x-Achse, das gruppierte (`beside = TRUE`) den Vergleich innerhalb der Gruppen (die Reihenfolge der Variablen in `table()` vertauscht die Rollen), der Mosaikplot zeigt Häufigkeiten als Flächen. Die Heatmap codiert sie als Farben; `heatmap()` sortiert Zeilen und Spalten standardmäßig per Clustering um, `scale = "none"` verhindert zusätzliches Skalieren.
+
+```{r w2-kreuztabelle}
+library(EcoData)
+titanic$pclass = factor(titanic$pclass)
+head(titanic[, c("pclass", "sex", "age")])
+
+kreuz = table(titanic$sex, titanic$pclass)
+print(kreuz)
+
+barplot(kreuz)
+legend("topleft", legend = c("Male", "Female"), col = c("gray", "black"), pch = 15)
+
+kreuz = table(titanic$pclass, titanic$sex)
+barplot(kreuz, beside = TRUE)
+
+mosaicplot(kreuz)
+heatmap(as.matrix(kreuz), scale="none")
+```
+
+Deskriptiv sehen wir: in der 1. Klasse sind relativ mehr Frauen als in der 3. Klasse. Ob so ein Unterschied größer ist, als man durch Zufall erwarten würde, kann die deskriptive Statistik nicht beantworten (Woche 3).
+
+## Kategorisch vs numerisch
+
+Erinnerung Boxplot, auf der X-Achse die kategoriale Variable. `age ~ pclass` ist eine Formel: "age in Abhängigkeit von pclass" (links die abhängige, rechts die erklärende Variable). Sie begegnet uns bei den Regressionen wieder.
+
+```{r w2-boxplot-beeswarm}
+
+boxplot(age~pclass, data = titanic)
+
+## Mit Notch
+boxplot(age~pclass, data = titanic, notch = TRUE)
+
+## Schöner mit Beeswarm
+
+boxplot(age~pclass, data = titanic, notch = TRUE, ylim = c(0,100))
+library(beeswarm)
+beeswarm(age~pclass, data = titanic,
+         add = T, pch = 16, cex = 0.5)
+text(1:3, rep(90,3),
+     paste("n=", table(titanic$pclass[!is.na(titanic$age)])))
+
+```
+
+Notch: die Einkerbung zeigt die Unsicherheit des Medians; nicht überlappende Notches sind laut R-Hilfe ein starkes Indiz für verschiedene Mediane (Orientierung, kein formaler Test). Der Beeswarm zeichnet zusätzlich alle Datenpunkte ein, `text()` schreibt die Zahl der Passagiere mit bekanntem Alter über die Gruppen.
+
+## Numerisch vs numerisch
+
+Für zwei numerische Variablen: Scatterplot (`plot(y ~ x)`) und Korrelation. `cor()` rechnet standardmäßig Pearson (linearer Zusammenhang), mit `method = "spearman"` die Rangkorrelation. Logarithmiert man `Petal.Length`, ändert sich die Pearson-Korrelation, die Spearman-Korrelation bleibt exakt gleich: sie beruht nur auf den Rängen, die eine monotone Transformation nicht verändert. `cor.test()` testet zusätzlich H0 "wahre Korrelation = 0" (Woche 3). `p-value < 2.2e-16` heißt: kleiner als der kleinste von R angezeigte Wert, nicht exakt 0.
+
+```{r w2-iris-korrelation}
+
+head(iris)
+plot(Sepal.Length~Petal.Length, data = iris)
+cor(iris$Sepal.Length, iris$Petal.Length)
+cor(iris$Sepal.Length, iris$Petal.Length, method = "spearman")
+
+plot(Sepal.Length~log(Petal.Length), data = iris)
+cor(iris$Sepal.Length, log(iris$Petal.Length))
+cor(iris$Sepal.Length, log(iris$Petal.Length), method = "spearman")
+
+cor.test(iris$Sepal.Length, iris$Petal.Length, method = "pearson")
+
+```
+
+## PCA (Hauptkomponentenanalyse)
+
+Bei mehr als zwei numerischen Variablen reicht die Paarkorrelation nicht mehr, um die Struktur der Daten zu erfassen. Die PCA dreht das Koordinatensystem so, dass möglichst viel der multivariaten Varianz auf den ersten Achsen liegt. Sie wird mit `prcomp` berechnet; `scale = TRUE` teilt vorher jede Variable durch ihre Standardabweichung (zu empfehlen, sonst bekommen Variablen mit großer Varianz mehr Gewicht). Wir benutzen nur die ersten 4 Spalten von `iris` (die Art `Species` ist kategorial).
+
+```{r w2-pca-iris}
+pca = prcomp(iris[,1:4], scale = TRUE)
+```
+
+Die Rotationsmatrix (die "Loadings": wie sich die neuen Achsen aus den Variablen zusammensetzen) sehen Sie mit:
+
+```{r w2-pca-rotation, eval = F}
+pca$rotation
+```
+
+Eine PCA ist erfolgreich, wenn die ersten Achsen viel mehr Varianz erklären als die hinteren. Das sehen wir in `summary` (Zeile "Proportion of Variance") oder im Plot: PC1 erklärt ca. 73 %, PC2 ca. 23 %, zusammen ca. 96 %. Die 4 Variablen lassen sich also gut mit 2 Achsen beschreiben, d.h. sie sind stark korreliert.
+
+```{r w2-pca-varianz}
+summary(pca)
+plot(pca)
+```
+
+Im Biplot (erste 2 Achsen) liegt jede Beobachtung im durch PC1 und PC2 aufgespannten Raum (die Zahlen sind Zeilennummern), die roten Pfeile zeigen die Beziehung zu den ursprünglichen Variablen. Pfeile in dieselbe Richtung gehören zu korrelierten Variablen, nah beieinander liegende Punkte zu ähnlichen Beobachtungen.
+
+```{r w2-pca-biplot}
+biplot(pca)
+```
+
+PC1 hängt hier positiv mit den Petal-Variablen und etwas schwächer mit der Sepal-Länge zusammen, die Sepal-Weite eher mit PC2. Weil die beiden Achsen zusammen 96 % der Varianz erklären, können wir schließen, dass die Petal-Variablen und die Sepal-Länge auch im Originaldatensatz korreliert sind (prüfen Sie das mit `cor()`).
+
+Aufgabe: eine PCA von Luftqualitätsmessungen aus New York. Wie viel Varianz erklären die ersten beiden Achsen im Vergleich zu `iris`? Welche Variablen zeigen im Biplot in dieselbe, welche in entgegengesetzte Richtung, und was heißt das für ihre Korrelationen? (`complete.cases()` entfernt vorher Zeilen mit fehlenden Werten.)
+
+```{r w2-pca-airquality}
+pca = prcomp(airquality[complete.cases(airquality),1:4], scale = TRUE)
+summary(pca)
+plot(pca)
+biplot(pca)
+```
+
+# Woche 3 - Hypothesentests {#woche-3}
+
+Für jeden Assoziationstyp aus Woche 2 wenden wir einen passenden Hypothesentest an: H0 (typischerweise: kein Effekt), Teststatistik, p-Wert; signifikant ist das Ergebnis, wenn p kleiner als das Signifikanzniveau (meist 0.05) ist. Der Output sieht immer ähnlich aus: Name des Tests, Teststatistik, Freiheitsgrade, p-Wert und Alternativhypothese (!H0).
+
+Daten vorbereiten (Installation von EcoData: siehe Woche 1). Die kategorialen Variablen werden in `factor` mit lesbaren Namen umgewandelt; die Reihenfolge der `labels` muss zur Reihenfolge der Werte passen (0 = died, 1 = survived).
+
+```{r w3-daten-vorbereiten}
+library(EcoData)
+# str(titanic)
+
+titanic$pclass = factor(titanic$pclass, labels = c("1.Kl", "2.Kl", "3.Kl"))
+titanic$sex = factor(titanic$sex)
+titanic$embarked = factor(titanic$embarked)
+titanic$survived = factor(titanic$survived, labels = c("died", "survived"))
+```
+
+## Tests auf Kreuztabellen (kat+kat)
+
+Kreuztabelle berechnen und visualisieren: überlebt (ja/nein) gegen Geschlecht.
+
+```{r w3-kreuztabelle}
+x = table(titanic$survived, titanic$sex)
+x
+barplot(x, beside = T)
+```
+
+Wenn mindestens eine Variable binär ist, kann man `prop.test` machen (H0: gleiche Anteile in den Gruppen). Achtung: bei einer Tabelle vergleicht `prop.test` die Zeilen, hier also den Frauenanteil unter den Gestorbenen (ca. 16 %) mit dem unter den Überlebenden (ca. 68 %). Für die Überlebensraten der Geschlechter müssten Sie die Tabelle transponieren (`prop.test(t(x))`), der p-Wert ist derselbe. Das Konfidenzintervall gehört zur Differenz der beiden Anteile.
+
+```{r w3-prop-test}
+prop.test(x)
+```
+
+Ansonsten Chi2-Test (H0: keine Assoziation), die Verallgemeinerung auf Kreuztabellen beliebiger Größe. Für 2x2 ist er identisch zu `prop.test` (gleiches X-squared; beide mit Yates-Kontinuitätskorrektur, in der Ausgabe als "with continuity correction" zu sehen).
+
+```{r w3-chisq-test}
+chisq.test(x)
+```
+
+Poweranalyse (nur für den Vergleich von Proportionen in 2 Gruppen vorgesehen): bei wahren Anteilen von 20 % und 25 % und 1000 Beobachtungen **pro Gruppe** ist die Power ca. 76 %, in knapp einem Viertel der Fälle wäre der Test trotz echtem Unterschied also nicht signifikant. Lässt man `n` weg und gibt `power = 0.8` vor, berechnet die Funktion die nötige Stichprobengröße (Versuchsplanung, Woche 7).
+
+```{r w3-power-prop}
+power.prop.test(n = 1000,
+                p1 = 0.2,
+                p2 = 0.25)
+```
+
+Für komplexere Poweranalysen braucht man spezielle R packages.
+
+## Tests auf Unterschiede im Mittelwert von 2 Gruppen (kat + num)
+
+Wir schauen uns die Altersunterschiede zwischen den Geschlechtern an.
+
+```{r w3-boxplot-alter-geschlecht}
+boxplot(age ~ sex, data = titanic, notch = T)
+```
+
+Der t-Test setzt Normalverteilung der Daten in beiden Gruppen voraus. Das prüft man im Histogramm und mit dem Shapiro-Test (H0: Normalverteilung; ein kleiner p-Wert spricht gegen die Normalverteilung). Bei großen Stichproben wird er schon bei kleinen, praktisch irrelevanten Abweichungen signifikant, schauen Sie deshalb immer auch die Abbildung an.
+
+Sind die beiden Gruppen normalverteilt?
+
+```{r w3-shapiro}
+shapiro.test(titanic$age[titanic$sex == "female"])
+hist(titanic$age[titanic$sex == "female"])
+shapiro.test(titanic$age[titanic$sex != "female"])
+```
+
+Nein (beide p-Werte sehr klein), also der nichtparametrische Mann-Whitney U-Test, in R `wilcox.test` (die Ausgabe nennt ihn "Wilcoxon rank sum test", es ist derselbe Test). Er setzt keine bestimmte Verteilung voraus und prüft eine Verschiebung der Verteilungen ("location shift").
+
+```{r w3-wilcox}
+wilcox.test(titanic$age[titanic$sex == "female"],
+            titanic$age[titanic$sex == "male"])
+```
+
+Gerade noch signifikant (p ≈ 0.04), aber der Unterschied ist klein (ca. 2 Jahre, siehe t-Test unten): signifikant heißt nicht groß. Mit weniger Daten (= weniger Power) wird das Ergebnis in der Regel n.s. Wir ziehen dazu zufällig 300 Passagiere (`sample.int`); das Ergebnis hängt von der Stichprobe ab, probieren Sie andere Seeds.
+
+```{r w3-wilcox-stichprobe}
+titanic2 = titanic[sample.int(nrow(titanic), 300), ]
+
+wilcox.test(titanic2$age[titanic2$sex == "female"],
+            titanic2$age[titanic2$sex == "male"])
+```
+
+Zum Vergleich der t-Test, den wir wegen des signifikanten Shapiro-Tests eigentlich nicht anwenden sollten (bei dieser Stichprobengröße ist er wegen des zentralen Grenzwertsatzes allerdings ziemlich robust, daher der ähnliche p-Wert: 0.041 vs. 0.042). R rechnet standardmäßig den Welch-Test (`var.equal = FALSE`, keine gleichen Varianzen). Die Ausgabe enthält die Gruppenmittelwerte und ein 95 %-Konfidenzintervall für die Differenz, das 0 knapp nicht einschließt (passt zum knappen p-Wert). Da `female` zuerst steht, ist die Differenz weiblich minus männlich, also negativ.
+
+Textbaustein: "Der Altersunterschied zwischen Frauen und Männern war signifikant (Welch t-Test, p = 0.04; Differenz der Mittelwerte -1.9 Jahre, 95 %-CI -3.7 bis -0.08)."
+
+```{r w3-t-test}
+t.test(titanic$age[titanic$sex == "female"],
+            titanic$age[titanic$sex == "male"])
+```
+
+Poweranalyse für den t-Test: die wahren Mittelwerte unterscheiden sich um `delta = 1`, die Standardabweichung ist `sd = 10`, 20 Beobachtungen pro Gruppe. Die Power liegt bei ca. 5 %, also praktisch beim Signifikanzniveau: der Effekt ist im Vergleich zum Rauschen so klein, dass der Test kaum zwischen H0 und !H0 unterscheidet. (Knapp unter 5 %, weil `power.t.test` ohne `strict = TRUE` nur eine Richtung zählt.) Für 80 % Power bräuchte man ca. 1571 Beobachtungen pro Gruppe: `power.t.test(power = 0.8, delta = 1, sd = 10)`, wobei auf ganze Beobachtungen aufgerundet wird.
+
+```{r w3-power-t}
+power.t.test(n = 20, delta = 1, sd = 10)
+```
+
+## Tests auf Korrelation (num + num)
+
+Zuletzt Tests auf Korrelation, mit dem Datensatz `plantHeight` aus EcoData: Korrelation zwischen der Temperatur im Vorkommensgebiet (`temp`) und der logarithmierten Wuchshöhe (`loght`) von Pflanzenarten.
+
+```{r w3-plantheight-scatter}
+#str(plantHeight)
+plot(loght ~ temp, data = plantHeight)
+```
+
+Pearson (lineare) Korrelation, H0: wahre Korrelation = 0. Wir finden eine signifikante positive Korrelation von ca. 0.5 (95 %-CI ca. 0.38 bis 0.60): in wärmeren Gebieten wachsen größere Arten.
+
+```{r w3-cor-pearson}
+cor.test(plantHeight$loght, plantHeight$temp)
+```
+
+Würden Sie erwarten, dass sich die Werte ändern, wenn wir auf einen Rangkorrelationskoeffizienten wechseln? Probieren wir es aus! Die Werte ändern sich nur wenig (rho ca. 0.46 statt r ca. 0.50). Die Warnung "cannot compute exact p-value with ties" ist harmlos: bei gleichen Werten benutzt R eine Näherung.
+
+```{r w3-cor-spearman}
+cor.test(plantHeight$loght, plantHeight$temp, method = "spearman")
+```
+
+# Woche 4 - MLE und Regression {#woche-4}
+
+Statt nur zu fragen "gibt es einen Effekt?" (Hypothesentest) schätzen wir jetzt die Stärke des Effekts (Maximum Likelihood Schätzer, MLE) mit ihrer Unsicherheit (Standardfehler, Konfidenzintervall). Die wichtigste Modellklasse dafür ist die Regression.
+
+Daten laden (EcoData: siehe Woche 1). Die Wuchsform `growthform` wird zum `factor`, und `Tree` wird mit `relevel` zur Referenzkategorie (warum das wichtig ist, sehen wir unten).
+
+```{r w4-daten}
+library(EcoData)
+plantHeight$growthform2 = relevel(as.factor(plantHeight$growthform), "Tree")
+```
+
+## Numerische erklärende Variable
+
+Beziehung Höhe gegen Temperatur
+
+```{r w4-scatter-temp}
+plot(loght ~ temp, data = plantHeight)
+```
+
+In den letzten beiden Wochen hatten wir uns diese Beziehung über eine Korrelation angeschaut. Ich zeige hier noch mal direkt den Hypothesentest, der ja sowohl die Korrelation und den p-Wert berechnet:
+
+```{r w4-cor-test}
+cor.test(plantHeight$loght, plantHeight$temp)
+```
+
+Jetzt fitten wir die lineare Regression. Wichtig: ihr statistisches Modell ist ein anderes als bei der Korrelation. Die Korrelation ist symmetrisch (Höhe und Temperatur ist dasselbe wie Temperatur und Höhe), die Regression nicht: sie minimiert die senkrechten Abstände (Residuen) der Punkte zur Geraden, deshalb macht es einen Unterschied, welche Variable vorne steht (probieren Sie `lm(temp ~ loght, data = plantHeight)`).
+
+```{r w4-lm-temp}
+fit <- lm(loght ~ temp, data = plantHeight)
+summary(fit)
+```
+
+So lesen Sie die Tabelle (Zahlen der Beispielausgabe):
+
+- `Estimate`: der MLE. Der Intercept ist der erwartete Wert bei Temperatur 0 (ca. -0.23; `loght` ist logarithmiert, das ist also keine Höhe in Metern, und Temperatur 0 kann außerhalb des Datenbereichs liegen), die Steigung die Änderung von `loght` pro Grad (ca. +0.042).
+- `Std. Error`: die Unsicherheit des Schätzers. Schätzer ± 1 SE ist etwa ein 68 %-, ± 1.96 SE etwa ein 95 %-Konfidenzintervall (exakt: `confint(fit)`).
+- `Pr(>|t|)`: p-Wert des t-Tests mit H0 "wahrer Parameter = 0". Bei einer einfachen Regression sind t- und p-Wert der Steigung identisch zum `cor.test` oben.
+- `Residual standard error`: Standardabweichung der Residuen. `Multiple R-squared`: erklärter Varianzanteil (ca. 25 %; bei einer einfachen Regression gleich Korrelation zum Quadrat, 0.496² ≈ 0.246). Der F-Test testet "alle Steigungen = 0".
+
+Textbaustein: "Die logarithmierte Pflanzenhöhe nahm mit der Temperatur signifikant zu (lineare Regression, p < 0.001, bester Schätzer 0.042 ± 0.006 (Standardfehler) pro Grad, R² = 0.25)."
+
+Visualisierung. `allEffects` aus dem Package `effects` zeichnet die Vorhersage mit Unsicherheitsband. Mit `partial.residuals = T` kommen die Datenpunkte (partielle Residuen) dazu: weicht die geglättete Linie deutlich von der Geraden ab, ist der Zusammenhang vermutlich nicht linear.
+
+```{r w4-effects-temp}
+library(effects)
+plot(allEffects(fit))
+plot(allEffects(fit, partial.residuals = T))
+```
+
+## Kategoriale erklärende Variable
+
+Bei kategorialen Variablen rechnet R die Kategorien intern in 0/1-Variablen um (Treatment-Kontraste): die erste Kategorie (hier `Tree`, deshalb das `relevel`) ist die Referenz und steckt im Intercept (= Mittelwert der Referenzgruppe, ca. 1.26), die übrigen Zeilen sind Differenzen zur Referenz (`Herb`: ca. -1.68, der Mittelwert der Kräuter ist also ca. 1.26 - 1.68 = -0.41). Die p-Werte testen nur gegen die Referenz. R² ca. 74 %. "10 observations deleted due to missingness": 10 Arten mit fehlenden Werten wurden nicht verwendet.
+
+```{r w4-lm-wuchsform}
+plot(loght ~ growthform2, data = plantHeight, las = 2)
+
+fit = lm(loght ~ growthform2, data = plantHeight)
+summary(fit)
+```
+
+Anova. Die ANOVA testet die Variable Wuchsform als Ganzes (H0: kein Effekt), das liefert die Regressionstabelle nicht. `Sum Sq` ist die erklärte (ca. 78.7) bzw. übrige Varianz (ca. 28.1): 78.7 / (78.7 + 28.1) ≈ 0.74 = R² von oben.
+
+```{r w4-anova-wuchsform}
+anova(fit)
+```
+
+## Residuenanalyse
+
+Die Regression nimmt normalverteilte Residuen mit konstanter Varianz und unabhängige Datenpunkte an; stimmt das nicht, ist das Ergebnis nicht verlässlich. Deshalb prüfen wir die Annahmen, hier exemplarisch nur für das erste Modell: zuerst der Effektplot mit partiellen Residuen (passt die Gerade?), dann die vier Standardplots (`par(mfrow = c(2,2))` ordnet sie in einem 2x2 Raster an, mit `par(mfrow = c(1,1))` setzen Sie das zurück):
+
+1. Residuals vs Fitted: kein Muster erwünscht. Ein Bogen deutet auf eine falsche funktionale Form (z.B. fehlender quadratischer Term), ein Trichter auf nicht konstante Varianz.
+2. Q-Q-Plot: liegen die Punkte ungefähr auf der Geraden, sind die Residuen ungefähr normalverteilt.
+3. Scale-Location: Wurzel der Beträge der standardisierten Residuen gegen die Vorhersage; die Linie sollte ungefähr waagerecht sein (konstante Streuung).
+4. Residuals vs Leverage: Punkte mit großem Residuum und großem Hebel (Leverage) beeinflussen die Regression stark.
+
+Bei Problemen: Formel ändern (Plot 1), y transformieren (Plots 2 und 3) oder prüfen, ob die Ergebnisse ohne Ausreißer robust bleiben (Plot 4).
+
+```{r w4-residuen}
+
+fit <- lm(loght ~ temp, data = plantHeight)
+plot(allEffects(fit, partial.residuals = T))
+
+par(mfrow = c(2,2))
+plot(fit)
+
+```
+
+## Ausblick
+
+Was wenn Temperatur und Wuchsform beide einen Effekt haben? Hier sind die Punkte nach Wuchsform eingefärbt: die Wuchsformen unterscheiden sich in der Höhe, und zusätzlich steigt die Höhe mit der Temperatur.
+
+```{r w4-ausblick-farben}
+plot(loght ~ temp, data = plantHeight, col = as.numeric(plantHeight$growthform2))
+```
+
+Wie man diese multiple Regression fittet, besprechen wir nächste Woche!
+
+# Woche 5 - Multiple Regression und Modellselektion {#woche-5}
+
+## Multiple Regression
+
+Die multiple Regression schätzt den Effekt jeder Variable korrigiert für die anderen; das macht einen Unterschied, wenn die erklärenden Variablen korreliert sind. Wieder die Titanic-Daten (setzt die Aufbereitung aus Woche 3 voraus, daher heißen die Klassen `1.Kl`, `2.Kl`, `3.Kl`).
+
+```{r w5-daten}
+library(EcoData)
+
+#str(titanic)
+titanic$sex = factor(titanic$sex)
+titanic$pclass = factor(titanic$pclass)
+```
+
+Zuerst die einfache Regression Alter ~ Geschlecht. Bei einer kategorialen Variable mit 2 Kategorien ist sie im Prinzip ein t-Test (mit gleichen Varianzen): der Intercept ist der Mittelwert der Frauen (ca. 28.7), `sexmale` der Unterschied der Männer (ca. +1.9, p ≈ 0.04). R² nur ca. 0.4 %.
+
+```{r w5-lm-sex}
+boxplot(age ~ sex, data = titanic, notch = T)
+fit = lm(age ~ sex, data = titanic)
+summary(fit)
+```
+
+Multiple Regression mit der Passagierklasse: der Schätzer für `sexmale` ändert sich von +1.9 auf ca. +3.7 Jahre, und Passagiere der 2. bzw. 3. Klasse sind bei gleichem Geschlecht ca. 10 bzw. 15 Jahre jünger als die der 1. Klasse. Der Schätzer ändert sich, weil Geschlecht und Klasse zusammenhängen: die Regression schätzt jetzt den Geschlechtsunterschied bei gleicher Klasse. Ob man für die Klasse korrigieren sollte, hängt von der angenommenen kausalen Struktur ab (Störfaktor, Mediator oder Collider, siehe Vorlesung am Dienstag).
+
+```{r w5-lm-sex-pclass}
+boxplot(age ~ sex + pclass, data = titanic, notch = T, las = 2)
+
+fit = lm(age ~ sex + pclass , data = titanic)
+summary(fit)
+
+library(effects)
+plot(allEffects(fit))
+```
+
+Mit Interaktion (`*` nimmt Haupteffekte und Interaktion ins Modell): wir fragen, ob der Geschlechtsunterschied von der Klasse abhängt. Die Interaktionsterme sind klein und nicht signifikant, wir haben dafür also keine Evidenz. **Mit Interaktion ändert sich die Bedeutung der Haupteffekte:** `sexmale` ist jetzt der Geschlechtsunterschied in der Referenzklasse (1. Klasse), nicht mehr der durchschnittliche Unterschied.
+
+```{r w5-lm-interaktion}
+fit = lm(age ~ sex * pclass , data = titanic)
+summary(fit)
+
+library(effects)
+plot(allEffects(fit))
+```
+
+Beispiel mit kontinuierlichen Variablen: wovon hängt die Pflanzenhöhe ab? Breitengrad (`lat`) und Nettoprimärproduktion (`NPP`) hängen beide mit der Höhe zusammen, aber auch untereinander (dritter Plot), d.h. sie sind kollinear.
+
+In der einfachen Regression hat `lat` einen deutlichen negativen Effekt (p < 0.001). Mit `NPP` und `temp` im Modell ist er praktisch verschwunden (ca. -0.002 statt -0.022, p ≈ 0.8), nur `NPP` bleibt signifikant: die einfache Regression hat den Effekt der korrelierten Variablen mitgeschätzt ("absorbiert"). Der Standardfehler von `lat` ist im multiplen Modell größer; "nicht signifikant" heißt deshalb nicht "kein Effekt". "6 observations deleted": Arten ohne NPP fallen heraus, das multiple Modell nutzt also weniger Daten.
+
+```{r w5-lm-plantheight}
+library(EcoData)
+plot(loght ~ lat  , data = plantHeight)
+plot(loght ~ NPP  , data = plantHeight)
+
+plot(NPP ~  lat  , data = plantHeight)
+
+fit <- lm(loght ~ lat  , data = plantHeight)
+summary(fit)
+
+fit <- lm(loght ~ lat + NPP + temp , data = plantHeight)
+summary(fit)
+```
+
+## Modellselektion
+
+Modellselektion fragt, welche Variablen (und welche Form) in ein Modell gehören. Die richtige Methode hängt vom Ziel ab: Hypothese testen (ANOVA bzw. Likelihood-Ratio-Test), möglichst gut vorhersagen (AIC) oder einen kausalen Effekt schätzen (volles Modell mit den Störfaktoren aus der kausalen Struktur). Likelihood oder R² allein sind kein Kriterium, weil das komplexere Modell die Daten immer besser (oder gleich gut) beschreibt.
+
+### ANOVA
+
+Die ANOVA (Typ I) nimmt die Variablen der Reihe nach ins Modell auf. `Sum Sq` ist die jeweils zusätzlich erklärte Varianz, der p-Wert (F-Test) fragt, ob die Variable das Modell verbessert, wenn die davor genannten schon drin sind (erste Zeile `lat`: Modell mit `lat` gegen Modell ohne Variablen, zweite Zeile `NPP`: `lat + NPP` gegen `lat`). Der F-Test benutzt die Restvarianz des vollen Modells, die p-Werte weichen deshalb leicht von getrennt gerechneten Modellvergleichen ab. Der p-Wert der letzten Variable entspricht dem in der Regressionstabelle.
+
+```{r w5-anova-typ1}
+summary(aov(fit))
+```
+
+Vorsicht! Die Reihenfolge macht einen Unterschied: jetzt ist `temp` (nach `NPP`) signifikant, weil `lat` noch nicht im Modell ist, und `lat` steht als Letztes (schwacher p-Wert wie in der Regressionstabelle). Welche Reihenfolge sinnvoll ist, hängt von Ihrer Hypothese ab.
+
+```{r w5-anova-reihenfolge}
+fit <- lm(loght ~ NPP + temp + lat, data = plantHeight)
+summary(aov(fit))
+```
+
+### AIC
+
+Das AIC = -2·logLik + 2·(Zahl der Parameter) belohnt gute Anpassung und bestraft zusätzliche Parameter; kleiner ist besser, ein Unterschied von mehr als 2 gilt als grobe Faustregel als relevant. Hier ist m2 (mit `lat`) leicht schlechter als m1: die Anpassung verbessert sich praktisch nicht (-2·logLik sinkt nur um ca. 0.07), die Strafe von 2 überwiegt. Das passt zum p-Wert in der ANOVA. AIC-Werte sind nur vergleichbar, wenn dieselben Daten benutzt wurden (hier ja: beide Modelle enthalten `NPP`).
+
+```{r w5-aic}
+m1 <- lm(loght ~ NPP + temp , data = plantHeight)
+m2 <- lm(loght ~ NPP + temp + lat , data = plantHeight)
+AIC(m1)
+AIC(m2)
+```
+
+# Woche 6 - GLM und maschinelles Lernen {#woche-6}
+
+Bei 0/1-Daten (überlebt ja/nein) oder Zähldaten können die Residuen nicht normalverteilt sein. Ein GLM besteht aus einem linearen Prädiktor, einer Verteilung (Binomial, Poisson) und einer Link-Funktion, die den Prädiktor in den zulässigen Wertebereich der Verteilung übersetzt. In R: `glm()` statt `lm()`, zusätzlich mit `family`; der Link wird passend zur Familie gewählt.
+
+## Logistische Regression
+
+Binomial GLM: beeinflusst das Alter die Überlebenswahrscheinlichkeit? `survived` ist der `factor` aus Woche 3 (`died`, `survived`), R modelliert die Wahrscheinlichkeit der zweiten Kategorie, `survived`.
+
+```{r w6-glm-titanic-age}
+library(EcoData)
+
+fit <- glm(survived ~ age, data = titanic, family = binomial)
+summary(fit)
+```
+
+Die Tabelle liest sich wie bei `lm`, **aber die Koeffizienten stehen auf der logit-Skala** (der Skala des linearen Prädiktors), nicht auf der Wahrscheinlichkeitsskala. Deshalb ist der Intercept (ca. -0.14) keine Wahrscheinlichkeit, sondern der Prädiktor für `age = 0`; erst `plogis(-0.14) ≈ 0.47` ist die Überlebenswahrscheinlichkeit. Das gilt auch für Werte über 1: im größeren Modell unten ist der Intercept ca. 3.5, und `plogis(3.5) ≈ 0.97` ist trotzdem eine Wahrscheinlichkeit. Neu in der Ausgabe: die Dispersion ist bei der Binomialverteilung fest (= 1), zu Deviance und Pseudo-R2 unten mehr.
+
+Effekte visualisieren. `allEffects` beschriftet die Achse mit Wahrscheinlichkeiten, zeichnet aber auf der logit-Skala: bei einem Prädiktor sieht die Linie deshalb fast gerade aus, mit ungleichen Abständen der Wahrscheinlichkeits-Ticks. Mit `plot(allEffects(fit), type = "response")` sehen Sie die gekrümmte Kurve.
+
+```{r w6-effects-titanic}
+library(effects)
+plot(allEffects(fit))
+```
+
+Vorhersage von Hand, in drei Schritten (die Zahlen stammen aus der Spalte `Estimate` oben):
+
+1. Linearen Prädiktor ausrechnen: Intercept + Steigung · Alter.
+2. Inverse Link anwenden: `plogis()` übersetzt die logit-Skala in eine Wahrscheinlichkeit. Die S-Kurve `curve(plogis, -4, 4)` zeigt, dass egal welche Zahl wir einsetzen das Ergebnis zwischen 0 und 1 liegt. (Merkregel: `logit` geht von der Wahrscheinlichkeit zur logit-Skala, `plogis` zurück; für Vorhersagen brauchen Sie immer `plogis`.)
+3. Ergebnis lesen. Alter 0: ca. 47 %. Alter 20: Prädiktor -0.1365 + 20 · (-0.0079) = -0.2945, `plogis(-0.2945)` ≈ 43 %.
+
+Kontrolle: `predict(fit, newdata = data.frame(age = 20), type = "response")`. Aufgabe: wie groß ist die Wahrscheinlichkeit für 50-Jährige? (Lösung: ca. 0.37.)
+
+Textbaustein: "Das Alter hatte keinen signifikanten Effekt auf die Überlebenswahrscheinlichkeit (logistische Regression, p = 0.07; Schätzer -0.008 ± 0.004 (SE) pro Jahr auf der logit-Skala)." (Nicht signifikant heißt nicht, dass es keinen Effekt gibt.)
+
+```{r w6-plogis-hand}
+curve(plogis, -4,4)
+plogis(-0.136531) # 0 Jahre alte Person
+plogis(-0.136531 + 20*-0.007899) # 20 Jahre alt
+
+```
+
+## Poisson Regression
+
+Für Zähldaten (0, 1, 2, ...): Poisson-Verteilung mit log-Link. Beispiel: Zahl der Fütterungen von Jungvögeln (`feeding`) in Abhängigkeit von ihrer Attraktivität (`attractiveness`). Hypothese: Eltern füttern attraktivere Jungvögel öfter.
+
+```{r w6-poisson-scatter}
+plot(feeding ~ attractiveness, data = birdfeeding)
+```
+
+Vorhergesagt wird `exp(Intercept + Steigung · attractiveness)`, die Vorhersage ist also immer positiv. Der Intercept ist ca. 1.47, d.h. `exp(1.47) ≈ 4.4` Fütterungen bei Attraktivität 0. Die Steigung steht auf der log-Skala: `exp(0.148) ≈ 1.16`, d.h. pro Attraktivitätspunkt steigt die erwartete Zahl um den Faktor 1.16 (ca. 16 %; p ≈ 0.007). Effekte sind hier multiplikativ, nicht additiv. Auch hier ist die Dispersion fest (Varianz = Mittelwert), was bei echten Daten oft nicht stimmt (Varianzüberschuss, siehe Vorlesung).
+
+```{r w6-glm-poisson}
+fit <- glm(feeding ~ attractiveness, data = birdfeeding, family = poisson)
+
+summary(fit)
+```
+
+Effekte visualisieren (gleiche Logik wie oben: Achse in Zählwerten, gezeichnet auf der log-Skala).
+
+```{r w6-effects-poisson}
+plot(allEffects(fit))
+```
+
+Von Hand, Vogel mit Attraktivität 2: erst der Prädiktor (Schritt 1), dann `exp()` (Schritt 2), ca. 5.9 erwartete Fütterungen.
+
+```{r w6-poisson-hand}
+lin = 1.47459 + 2 * 0.14794
+exp(lin)
+```
+
+Optional: Poisson mit `link = "identity"` (Prädiktor = Erwartungswert, additive Steigung: ca. +1 Fütterung pro Punkt). Im Datenbereich passt das Modell ähnlich gut (ähnliches AIC), aber der identity-Link kann für extreme x-Werte negative Vorhersagen liefern, was bei Zähldaten unmöglich ist.
+
+```{r w6-poisson-identity}
+fit <- glm(feeding ~ attractiveness, data = birdfeeding, family = poisson(link = "identity"))
+
+summary(fit)
+```
+
+## ANOVA, R2, Modellselektion für GLMs
+
+Für GLMs gibt es analoge Werkzeuge, aber R² und Varianzzerlegung der ANOVA sind nicht direkt anwendbar. Stattdessen benutzt man die Deviance (bei 0/1-Daten gleich -2·log-Likelihood; kleiner ist besser).
+
+### Pseudo R2
+
+Pseudo-R2 = 1 - Residual Deviance / Null Deviance, d.h. der Anteil der Deviance, den das Modell gegenüber dem Modell nur mit Intercept erklärt. Beide Werte lesen Sie in `summary` ab (`Null deviance`, `Residual deviance`). Das Alter allein erklärt praktisch nichts (ca. 0.2 %), mit Geschlecht und Klasse sind es ca. 31 %.
+
+Im größeren Modell ist der Intercept der Prädiktor für die Referenzperson (weiblich, 1. Klasse, Alter 0), die Überlebenswahrscheinlichkeit ist `plogis(Intercept)`. Der Alterseffekt ist jetzt deutlich stärker und hoch signifikant (ca. -0.034 pro Jahr, p < 0.001; vorher -0.008, p ≈ 0.07). Hauptgrund ist die Klasse: ältere Passagiere reisten häufiger in der 1. Klasse, die höhere Überlebenschancen hatte, das hat den Alterseffekt in der einfachen Regression verdeckt (Korrektur wie in Woche 5). Ein Teil der Vergrößerung ist ein Skalierungseffekt logistischer Modelle (Koeffizienten wachsen oft betragsmäßig, wenn Variablen dazukommen).
+
+```{r w6-pseudo-r2}
+fit <- glm(survived ~ age, data = titanic, family = binomial)
+summary(fit)
+
+# pseudo R2 =
+1 - 1411.4/1414.6
+
+fit2 <- glm(survived ~ age + sex + factor(pclass), data = titanic, family = binomial)
+summary(fit2)
+
+# pseudo R2 =
+1 - 982.45/1414.6
+```
+
+### Modellvergleich
+
+Vergleich mit AIC oder ANOVA. Das AIC von `fit2` ist um mehr als 400 niedriger. `anova(..., test = "Chisq")` ist ein Likelihood-Ratio-Test (Woche 5) für genestete Modelle, d.h. das größere enthält das kleinere (hier `fit` in `fit2`, weil `fit2` nur Terme dazunimmt): die Deviance nimmt um ca. 429 ab, für 3 zusätzliche Parameter (1 für `sex` + 2 für `pclass`). Mit nur einem Modell testet `anova(fit2, test = "Chisq")` Variable für Variable der Reihe nach (wie die Typ I ANOVA, die Reihenfolge ist wichtig): deshalb ist das Alter dort als erste Variable nicht signifikant (p ≈ 0.07), in der Regressionstabelle von `fit2` aber schon (dort nach Korrektur für Geschlecht und Klasse).
+
+```{r w6-modellvergleich}
+AIC(fit)
+AIC(fit2)
+
+anova(fit, fit2, test = "Chisq")
+
+# test fuer jeden Parameter einzeln
+anova(fit2, test = "Chisq")
+```
+
+# Woche 7 - Planung von Experimenten {#woche-7}
+
+Die Vorlesung am Dienstag war konzeptionell (Validität, Versuchsdesign), dazu gibt es keinen R Code. Praktisch ist die Bestimmung der Stichprobengröße über eine Poweranalyse (wie in Woche 3), hier für das Düngerbeispiel: die Kontrolle wächst mit 4.2 t/ha, ein Düngereffekt von ca. 2 t/ha soll nachweisbar sein, die Standardabweichung zwischen Pflanzen beträgt ca. 1.5 t/ha. Wir lassen `n` weg und geben die gewünschte Power vor, R berechnet die Zahl der Replikate pro Gruppe (9.9, aufgerundet also 10).
+
+```{r w7-power-duenger}
+power.t.test(delta = 2, sd = 1.5, power = 0.8)
+```

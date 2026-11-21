@@ -1,0 +1,31 @@
+---
+title: "Statistik für Biologen"
+subtitle: "BSc Biologie, Modul Statistik und Bioinformatik"
+author:
+  - name: "Prof. Dr. Florian Hartig"
+    url: https://www.uni-regensburg.de/biologie-vorklinische-medizin/forschen/arbeitsgruppen/ag-hartig
+    affiliation:
+      - name: "Theoretische Ökologie, Universität Regensburg"
+        url: https://www.uni-regensburg.de/biologie-vorklinische-medizin/forschen/arbeitsgruppen/ag-hartig
+language:
+  title-block-author-single: "Dozent"
+  title-block-affiliation-single: "Arbeitsgruppe"
+---
+
+Begleitmaterial zur Statistikvorlesung (5. Semester BSc Biologie, 7 Wochen). Folien, Übungen, Forum und Skript finden Sie im [GRIPS-Kurs der Vorlesung](https://elearning.uni-regensburg.de/course/view.php?id=491).
+
+## Vorlesungsthemen {#vorlesungsthemen}
+
+Jede Woche hat zwei Vorlesungen: x.1 am Dienstag (Theorie), x.2 am Donnerstag (Praxis). Diese Kürzel (z.B. IV.1 = Woche 4, Dienstag) verwendet auch die [Klausurvorbereitung](klausurvorbereitung/Klausurvorbereitung.qmd) beim Hinweis zum Nachlesen.
+
+| Woche | Dienstag | Donnerstag | R-Code |
+|---|---|---|---|
+| 1 | **I.1** Was ist Statistik? Daten und Skalenniveaus, univariate deskriptive Statistik (Lage- und Streuungsmaße, gute Abbildungen) | **I.2** Einführung in R und RStudio, Grafiken, Wahrscheinlichkeitsverteilungen (Normal-, Binomialverteilung), zentraler Grenzwertsatz | [Woche 1](vorlesung/R-Code-Vorlesung.qmd#woche-1) |
+| 2 | **II.1** Korrelation und Assoziation: Kreuztabellen, Mosaikplot, Boxplot, Pearson- und Rangkorrelation | **II.2** PCA und Clustering, Ausblick auf die schließende Statistik (Stichprobe, Hypothesentest) | [Woche 2](vorlesung/R-Code-Vorlesung.qmd#woche-2) |
+| 3 | **III.1** Hypothesentests: Teststatistik, p-Wert, Signifikanz, t-Test, Fehlerraten und Power | **III.2** Tests in der Praxis (prop.test, Chi-Quadrat-Test, t-Test, Mann-Whitney-U-Test, Korrelationstests), multiples Testen, False Discovery Rate | [Woche 3](vorlesung/R-Code-Vorlesung.qmd#woche-3) |
+| 4 | **IV.1** Maximum Likelihood, Konfidenzintervall, Bayes, Einführung lineare Regression | **IV.2** Regression in der Praxis: kategoriale Prädiktoren, Kontraste, ANOVA, Residuendiagnostik | [Woche 4](vorlesung/R-Code-Vorlesung.qmd#woche-4) |
+| 5 | **V.1** Kausalität (Störfaktor, Mediator, Collider) und multiple Regression | **V.2** Modellselektion: Bias-Variance Trade-off, Likelihood-Ratio-Test, AIC | [Woche 5](vorlesung/R-Code-Vorlesung.qmd#woche-5) |
+| 6 | **VI.1** Generalisierte lineare Modelle: logistische und Poisson-Regression, Link-Funktion, Overdispersion | **VI.2** Maschinelles Lernen und KI: Statistik vs. ML, Kreuzvalidierung, Random Forest, Fallstricke; Ausblick Deep Learning und Sprachmodelle | [Woche 6](vorlesung/R-Code-Vorlesung.qmd#woche-6) |
+| 7 | **VII.1** Validität und Versuchsplanung: Randomisierung, Replikation, Blockdesign, Poweranalyse, Beobachtungsstudien | **VII.2** Zusammenfassung und Klausurvorbereitung | [Woche 7](vorlesung/R-Code-Vorlesung.qmd#woche-7) |
+
+Zur Prüfungsvorbereitung: [Klausurvorbereitung](klausurvorbereitung/Klausurvorbereitung.qmd) (Übungsfragen mit Antworten).

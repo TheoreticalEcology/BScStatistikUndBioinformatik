@@ -1,0 +1,117 @@
+---
+title: "Woche 5 - R Code der Vorlesung"
+author: "Florian Hartig"
+format: 
+  pdf:
+    toc: true
+editor_options: 
+  chunk_output_type: console
+---
+
+# Dienstag
+
+Beispiel multiple Regression
+
+```{r}
+fit <- lm(Ozone ~ Temp + Wind, data = airquality)
+summary(fit)
+
+```
+
+Vergleich einfache Regression
+
+```{r}
+fit <- lm(Ozone ~ Temp , data = airquality)
+summary(fit)
+```
+
+Die Unterschiede in den Effektschätzern entstehen durch die Kollinearität zwischen Wind und Temperatur
+
+```{r}
+plot(Temp ~ Wind, data = airquality)
+
+
+
+```
+
+# Donnerstag
+
+## Beispiel LRT
+
+```{r}
+ratios = rep(NA, 1000)
+for(i in 1:1000){
+  # erzeuge Daten ohne Abhängigkeit
+  x = rnorm(100)
+  y = rnorm(100)
+  # vergleiche Log Likelihood M1 = y ~ x , M0 = y ~ 1
+  ratios[i] = logLik(lm(y ~ x))  - logLik(lm(y ~ 1))
+}
+
+hist(ratios, breaks = 100)
+
+```
+
+## Analyse Ihrer Daten
+
+Daten einlesen
+
+```{r}
+daten <- read.csv("../Woche1/Biostatistik Umfrage 2022.csv", stringsAsFactors = T, na.strings = c(""))
+daten$Zeitstempel = NULL
+colnames(daten) = c("Einwohner", "Distanz", "Körpergröße", "Körpergewicht", "Geschlecht", "Händigkeit", "Wohnform", "Verkehrsmittel",  "Getränk", "Vegetarier","Studium", "CO2_Steuer", "Parkplatzgebühr", "Atomkraftwerke", "CRISPR-Cas")
+
+```
+
+### Körpergewicht \~ Vegetarier
+
+Einfache Regression
+
+```{r}
+plot(Körpergewicht ~ Vegetarier, data =daten, col = "lightgrey", notch = T)
+fit <- lm(Körpergewicht ~ Vegetarier, data =daten)
+summary(fit)
+```
+
+Könnte Scheinkorrelation sein wegen Vegetarier \~ Geschlecht, deshalb multiple Regression
+
+```{r}
+fit <- lm(Körpergewicht ~ Vegetarier + Geschlecht, data =daten)
+summary(fit)
+```
+
+### Körpergewicht \~ Verkehrsmittel
+
+```{r}
+boxplot(Körpergewicht ~ Verkehrsmittel, data =daten)
+fit <- lm(Körpergewicht ~ Verkehrsmittel, data =daten)
+summary(fit)
+
+```
+
+Auch hier haben wir nach Diskussion in der Klasse überlegt, ob dies eine Scheinkorrelation sein könnte, wegen Verkehrsmittel \~ Geschlecht, ev. Distanz.
+
+Multiple Regression und Kreuztabelle bestätigt das
+
+```{r}
+fit <- lm(Körpergewicht ~ Verkehrsmittel + Geschlecht + Distanz, data =daten)
+summary(fit)
+
+table(daten$Geschlecht, daten$Verkehrsmittel)
+```
+
+Final noch ein Beispiel für die Modellselektion - Geschlecht wird selektiert, eine zufällige Variable nicht.
+
+```{r}
+daten$random = rnorm(nrow(daten))
+
+M0 <- lm(Körpergewicht ~ Verkehrsmittel, data =daten)
+M1 <- lm(Körpergewicht ~ Verkehrsmittel + Geschlecht , data =daten)
+M2 <- lm(Körpergewicht ~ Verkehrsmittel + random , data =daten)
+
+summary(aov(M2))
+
+AIC(M0)
+AIC(M1)
+AIC(M2)
+```

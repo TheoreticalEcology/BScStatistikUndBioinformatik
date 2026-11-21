@@ -1,0 +1,206 @@
+---
+title: "Woche 7 - Versuchsplanung"
+author: "Florian Hartig"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    toc: yes
+editor_options:
+  chunk_output_type: console
+---
+
+```{r global_options, include=FALSE}
+Sys.setlocale("LC_ALL", "de_DE.UTF-8")
+knitr::opts_chunk$set(fig.width=5, fig.height=5)
+```
+
+Bemerkung: diese Woche machen wir ein paar etwas exotischere / kompliziertere Sachen. Die Beispiele sind nur bezüglich der generellen Konzepte (z.B. Power) klausurrelevant, aber nicht der R code oder spezielle Outputs. Es geht hier hauptsächlich nur darum, noch mal aufzuzeigen was möglich ist. 
+
+# Berechnung von optimalem Studiendesign / Versuchsplan
+
+Beispiel für ein R package, dass automatisch optimale Designs berechnet, nur damit Sie wissen, dass es das auch gibt
+
+```{r}
+library(planor)
+
+mydesign <- regular.design(factors=c("block", LETTERS[1:4]),
+nlevels=rep(3,5), model=~block + (A+B+C+D)^2, estimate=~A+B+C+D,
+nunits=3^3, randomize=~block/UNITS)
+print(mydesign)
+```
+
+# Trombose
+
+## Frage und statistischer Test
+
+Frage: wir wollen ein neues Medikament testen, um Trombose zu vermeiden. Die Hypothese ist, dass die Wirksamkeit vom Gewicht der Patienten abhängt.
+
+Frage: was ist unsere Hypothese, und welches Modell würden wir fitten?
+
+Hypothese: Trombose = Medikament * Gewicht
+
+```{r, eval=F}
+fit <- glm(Trombose ~ Medikament * Gewicht, family = "binomial")
+```
+
+## Power
+
+Gehen wir davon aus, wir weisen die Medikament / Kontrolle zufällig zu, und Gewichte unsere Probanden sind uniform zwischen 60 und 80kg verteilt. Dann können wir uns zufällige Daten erzeugen 
+
+```{r}
+set.seed(123)
+n = 5000
+daten = data.frame(Medikament = as.factor(sample(c("c","t"), n, T)), Gewicht = runif(n, 60,80))
+```
+
+Mache Annahmen wie der Effekt aussieht - in einem komplexen Experiment mit mehreren Variablen natürlich schwer zu wissen, deshalb werden oft Pilotstudien gemacht
+
+```{r}
+daten$Trombose = rbinom(n, 1, plogis( ifelse(daten$Medikament == "c", 
+                                      -2 + 0.02 * daten$Gewicht, 
+                                      -2 + 3 - 0.02 * daten$Gewicht )))
+```
+
+```{r}
+fit <- glm(Trombose ~ Medikament * Gewicht, family = "binomial", data = daten)
+summary(fit)
+```
+
+das war wohl nichts ... versuchen wir das gleich mal mit einem größeren n
+
+```{r}
+set.seed(123)
+n = 5000
+daten = data.frame(Medikament = as.factor(sample(c("c","t"), n, T)), Gewicht = runif(n, 60,80))
+daten$Trombose = rbinom(n, 1, plogis( ifelse(daten$Medikament == "c", 
+                                      -2 + 0.02 * daten$Gewicht, 
+                                      -2 + 3 - 0.02 * daten$Gewicht )))
+fit <- glm(Trombose ~ Medikament * Gewicht, family = "binomial", data = daten)
+summary(fit)
+
+```
+
+Aha ... jetzt passt es grob. Aber wie oft würde das funktionieren? Hier haben wir ja nur einma zufällig Daten erzeugt.
+
+
+
+```{r}
+set.seed(123)
+n = 5000
+res <- matrix(nrow = 100, ncol = 4)
+
+for(i in 1:100){
+  daten = data.frame(Medikament = as.factor(sample(c("c","t"), n, T)), Gewicht = runif(n, 60,80))
+  daten$Trombose = rbinom(n, 1, plogis( ifelse(daten$Medikament == "c", 
+                                        -2 + 0.02 * daten$Gewicht, 
+                                        -2 + 3 - 0.02 * daten$Gewicht )))
+  fit <- glm(Trombose ~ Medikament * Gewicht, family = "binomial", data = daten)
+  x = summary(fit)
+  res[i,] = x$coefficients[,4]
+}
+
+colMeans(res < 0.05)
+```
+
+
+
+# Machine learning with random forest
+
+standard lm
+
+```{r}
+ozone.lm <- lm(Ozone ~ ., data=airquality)
+summary(ozone.lm)
+```
+
+random forest
+
+```{r}
+library(randomForest)
+ozone.rf <- randomForest(Ozone ~ ., data=airquality, mtry=3,
+                         importance=TRUE, na.action=na.omit, keep.inbag=T)
+print(ozone.rf)
+plot(ozone.rf)
+
+# Struktur des RF
+
+#library(devtools)
+#install_github("araastat/reprtree")
+library(reprtree)
+reprtree:::plot.getTree(ozone.rf)
+
+  
+#Der Random Forest liefert keine p-Werte o.ä., aber man kann sich wenigsten die Wichtigkeit der verschiedenen Variablen anzeigen lassen, wobei sich hier Wichtigkeit auf die Wichtigkeit für die Vorhersage bezieht, eine kausale Annahme wird hier nicht gemacht. 
+
+varImpPlot(ozone.rf)
+
+# Schoener
+
+#install.packages("forestFloor")
+library(forestFloor)
+
+ff = forestFloor(ozone.rf,airquality[complete.cases(airquality),-1])
+print(ff)
+plot(ff)
+ show3d(ff)
+```
+
+
+
+```{r}
+
+# RF kann auch klassifizieren (0/1, oder Faktor)
+
+model <- randomForest(Species ~ ., data=iris, importance=TRUE, ntree=500, mtry = 2, do.trace=100,  keep.inbag=T)
+
+reprtree:::plot.getTree(model)
+
+ff = forestFloor(model,iris[,-5])
+show3d(ff)
+plot_simplex3(ff)
+```
+
+# Weihnachtskarte
+
+```{r}
+
+  # Modifiziert von Holiday caRd 2016
+  # Caroline M. Tucker
+  
+  ##install library
+  #install.packages("igraph")
+  library("igraph")
+  
+  ###Make SI model
+  par(bg="aliceblue")
+  #Initial set up
+  size=50 #number of vertices
+  rate <- 0.10 #infection rate
+  infnum <- round(seq(from=0, to=size, length.out=10)) #initial infection
+  
+  #wreath <- make_ring(size)
+  wreath <- graph.ring(size)
+  wreathN = connect.neighborhood(wreath, 7) 
+  V(wreathN)$color <- "yellow3"
+  V(wreathN)$size <- runif(size, 2, 7)
+  wreathN$AdjList = get.adjlist(wreathN, mode="out")
+  L=layout.fruchterman.reingold(wreathN) #layout_with_fr(wreathN)
+  
+  #Plot
+  plot(wreathN, vertex.label=NA, vertex.size=V(wreathN)$size, edge.width=2, edge.color="green", vertex.color=V(wreathN)$color, vertex.frame.color=NA, edge.curved=0.2, layout=L)
+  
+  	for(i in 1:25){ #timesteps
+  		oldinf <- infnum	#recovering
+  		newinf <- sort(unlist(lapply(wreathN$AdjList[infnum], FUN=function(X){sample(X, round(length(X)*rate))})))
+  		V(wreathN)$color <- "yellow" #all
+  		V(wreathN)$color[oldinf] <- "orange" #recovering
+  		V(wreathN)$color[newinf] <- "red" #new infected
+  		V(wreathN)$size[newinf] <- 5 
+  		plot(delete.edges(wreathN, E(wreathN)), vertex.size=runif(size, 1, 10), vertex.label=NA, edge.width=0, vertex.frame.color=c("lightgrey"), add=TRUE, layout=L)
+  				}
+  				
+  text(0, 0, "Frohe Weihnachten 2018 \nund ein gutes neues Jahr!", cex=2, col=c("darkgreen"), font=2.1, family="serif")
+
+```
+
+

@@ -1,0 +1,113 @@
+---
+title: "Woche 7 - GLM und ML"
+author: "Maximilian Pichler"
+format: 
+  html:
+    toc: true
+    embed-resources: true
+    self-contained-math: true
+editor: 
+  markdown: 
+    wrap: 72
+---
+
+## Offene Fragen
+
+### R - Bedienung
+
+Funktionen:
+
+ergebnis = f(argument1, argument2, argument3, ...)
+
+Argumente haben mehrere Aufgaben, zum einen werden ueber sie die Daten
+an die Funktion uebergeben (meistens die ersten Argumente) und zum
+anderen koennen sie das Verhalten der Funktion veraendern.
+
+Es gibt zwei verschiedene Typen von Argumenten:
+
+-   Argumente ohne defaults (in der Hilfe meist einfach genannt als zB x
+    oder y)
+-   Argumente mit defaults (e.g. alternative = c("two.sided", "less",
+    "greater"))
+
+Argumente mit defaults muessen nicht spezifiziert werden, wenn der User
+keinen Wert fuer diese Argumente uebergibt, werden einfach die default
+Werte angenommen (die in der Hilfe zu finden sind). Bei Argumenten ohne
+default Werte, muessen wir beim Funtionsaufruf Werte/Daten an diese
+Argumente uebergeben.
+
+### Frage 9 - Logistische Regression
+
+Fitten Sie die folgende logistische Regression (Erinnerung: die
+logistische Regression nimmt einen logit Link und Binomialverteilung der
+Daten an). Welche der folgenden Aussagen sind korrekt?:
+
+-   Geschwüre traten signifikant häufiger an dickeren Tumoren auf.
+-   Geschwüre traten signifikant häufiger bei Männern auf.
+-   Der Zusammenhang zwischen Tumordicke und Geschwürbildung
+    unterscheidet sich signifikant zwischen männlichen und weiblichen
+    PatientInnen
+-   Das Modell erklärt ca. 16.8 % (Pseudo-R2) der Varianz der Daten.
+-   Des Geschlecht der PatientInnen erklärt weniger als 1 % der Varianz
+    der Daten.
+
+```{r}
+library(boot)
+head(melanoma)
+str(melanoma)
+fit <- glm(ulcer~thickness*factor(sex), family = binomial, data = melanoma)
+summary(fit)
+anova(fit, test = "Chisq")
+```
+
+Pseudo R-squared:
+
+```{r}
+1-234/281
+```
+
+### Frage 12
+
+In einem Experiment wurden die Nachkommen der Wasserfloh-Art
+Ceriodaphnia dubia in Abhängigkeit von unterschiedlichen Konzentrationen
+des Herbizids Nitrofen gezählt. Die Daten finden Sie im Datensatz
+nitrofen im Package boot ( total = Gesamtzahl an Nachkommen, conc =
+Konzentration von Nitrofen).
+
+Fitten Sie nun ein GLM mit Poisson-Verteilung und log Link-Funktion für
+den Zusammenhang zwischen Nachkommenzahl und Nitrofen-Konzentration:
+
+```{r}
+library(boot)
+data(nitrofen)
+head(nitrofen)
+str(nitrofen)
+
+nitrofen$conc <- as.factor(nitrofen$conc)
+
+
+fit <- glm(total ~ conc, family = "poisson", data=nitrofen)
+summary(fit)
+
+library(DHARMa)
+res <-simulateResiduals(fit)
+testDispersion(res)
+
+```
+
+Da conc eine kategoriale Variable ist, zeigt Ihnen die summary Funktion
+Schätzer und p-Werte der verschiedenen Konzentrationen gegen die
+Referenz (in diesem Fall 0) an, aber nicht die Gesamtsignifikanz des
+Faktors Referenz.
+
+Wie testet man noch mal diesen Wert? Führen Sie den geeigneten Test
+durch, um zu schauen, ob die Variable conc als ganzes einen Effekt hat.
+Wie viele Sternchen werden für die Signifikanz ausgegeben?
+
+Hinweis: bei der Anwendung der Funktion die option test = "Chisq"
+übergeben, damit p-Werte angezeigt werden.
+
+```{r}
+anova(fit, test = "Chisq")
+
+```

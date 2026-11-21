@@ -1,0 +1,183 @@
+---
+title: "Woche 4 - Hypothesesntests"
+author: "Maximilian Pichler"
+format: 
+  html:
+    toc: true
+    embed-resources: true
+    self-contained-math: true
+editor: 
+  markdown: 
+    wrap: 72
+---
+
+## Offene Fragen - Hypothesentests
+
+### Prop.test
+
+Beispiel von Robert Rutledge, Annals of Surgery (1993), für die
+Mortalität von Unfallopfern mit und ohne Sicherheitsgurt. Daten einlesen
+in R
+
+```{r}
+survivors <- matrix(c(1781,1443,135,47), ncol=2)
+colnames(survivors) <- c('survived','died')
+rownames(survivors) <- c('no seat belt','seat belt')
+```
+
+Geben Sie nun z.B. survivors in R ein, um die Kontingenztabelle
+anzuzeigen. Wenn Sie wollen, können Sie auch ein Balkendiagramm
+erstellen, um die Assoziation zu visualisieren (siehe letzte Woche).
+
+Kontigenztabelle:
+
+```{r}
+survivors
+```
+
+Balkendiagramm:
+
+```{r}
+barplot(t(survivors))
+```
+
+Prop.test:
+
+**H0: Kein Unterschied in der Rate von nicht gestorben zu gestorben
+zwischen kein Gurt und Gurt getragen**
+
+```{r}
+prop.test(survivors) 
+```
+
+p-value ist 8.105e-07 und damit \$\<\alpha (5%) \$ und somit stat.
+signifikant und wir haben einen signifikanten Unterschied gefunden!
+
+### Shapiro.test
+
+In einem Experiment (R Datensatz PlantGrowth) wurde Pflanzenwachstum
+(Gewicht) für eine Kontrolle und 2 Behandlungen erhoben. Sie können die
+Ergebnisse über
+
+```{r}
+boxplot(weight ~ group, data = PlantGrowth)
+```
+
+visualisieren. Wir speichern uns zunächst nur die Wachstumswerte für
+Kontrolle und Behandlung 2 über den Befehl subset in getrennten Objekten
+ab.
+
+```{r}
+kontrolle = subset(PlantGrowth$weight, PlantGrowth$group == "ctrl")
+behandlung2 = subset(PlantGrowth$weight, PlantGrowth$group == "trt2")
+```
+
+Jetzt sind Sie an der Reihe - Beantworten Sie die folgenden Fragen:
+
+Wenden Sie den Shapiro-Wilks-Test in R an (z.B shapiro.test(kontrolle)),
+um zu testen, ob die Daten normalverteilt sind. Ist einer der beiden
+Shapiro Tests signifikant?
+
+**H0 von Shapiro: Daten sind normalverteilt**
+
+```{r}
+shapiro.test(kontrolle)
+shapiro.test(behandlung2)
+```
+
+P-values sind 0.7475 und 0.563 und damit sind beide Tests n.s. und wir
+lehnen die H0 nicht ab und folgern daraus dass die Daten normalverteilt
+sind.
+
+### t-Test
+
+Da die shapiro tests n.s. waren, ist die Voraussetzung fuer einen t-test
+erfuellt.
+
+Rechnen Sie einen t-Test für Kontrolle gegen Behandlung 2 - welche der
+folgenden Sätze wären korrekte Interpretationen des Ergebnisses in einer
+Bachelorarbeit (Mehrfachnennungen möglich)
+
+```{r}
+t.test(kontrolle, behandlung2)
+```
+
+Der p-value ist 0.0479 und damit $<0.05$ weshalb der Unterschied
+zwischen kontrolle und Behandlung 2 signifikant ist.
+
+"Es wurde ein signifikanter Unterschied zwischen der Kontrolle und der
+Behandlung gefunden (t-test, p = 0.0479)"
+
+### Power test I
+
+Sie möchten ein Experiment durchführen, und planen die Daten mit einem
+t-test (2-seitig, wir gehen davon aus, dass die Daten normalverteilt
+sind) auszuwerten. Die voraussichtliche Effektstärke (Unterschied der
+Mittelwerte) schätzen Sie auf 0.5. Aufgrund der Ergebnisse aus
+vorangegangenen Experimenten schätzen Sie die Varianz (Streuung) der
+gemessenen Variable auf 1. Sie planen eine Stichprobenzahl von n = 40
+(pro Gruppe). Was ist ihre Power / Teststärke bei einem Signifikanzlevel
+von 0.05, d.h. mit welcher Rate werden Sie einen Effekt nachweisen
+können, wenn dieser tatsächlich vorhanden ist?
+
+Effekt = 0.5 Streuung = 1 n = 40 alpha = 0.05 Power = gesucht
+
+```{r}
+Effekt = 0.5
+Streuung = 1
+n = 40
+alpha = 0.05
+
+power.t.test(n = 40, delta = Effekt, sd = Streuung, sig.level = alpha) 
+```
+
+Ergebnis: power = 0.5981316
+
+### False discovery rate
+
+Type I Rate: Rate fälschlicherweise abgelehnten H0 (p\<=0.05) obwohl
+kein Effekt (bei alpha = 0.05 -\> Type I Error rate beträgt 5%)
+
+FDR: Rate an falsch positiven unter den signifkanten Ergebnissen!:
+
+$$
+FDR = \frac{p(H_0)\cdot\alpha}{p(H_0)\cdot\alpha + p(!H_0)\cdot(1-\beta)}
+$$
+
+Sie schätzen, dass in ihrem Versuchstyp eine a priori Wahrscheinlichkeit
+von 0.3 dafür besteht, dass kein Effekt da ist (also: p(H0) = 0.3).
+Verwenden Sie die von Ihnen in der vorangegangenen Frage berechnete
+Teststärke (Power), um die False Discovery Rate (FDR) ihres Experiments
+zu berechnen. Geben Sie das Ergebnis auf zwei Nachkommastellen gerundet
+an ("," als Komma, nicht "."). Siehe Skript für Formel.
+
+```{r}
+power = 0.59
+p_H = 0.3
+alpha = 0.05
+
+FDR = (p_H*alpha)/(p_H*alpha + (1-p_H)*power)
+print(FDR)
+```
+
+### Power test II
+
+Sie planen ein Experiment. Die gemessene Variable ist normalverteilt und
+streut voraussichtlich mit einer Varianz von 1. Sie möchten Fehler 1.
+Art gering halten, und wählen daher ein Signifikanzlevel von 0.01. Die
+Ergebnisse möchten Sie mit einem zweiseitigen t-Test auswerten. Wie
+viele Stichproben müssen Sie nehmen, um einen Unterschied im Mittel von
+0.2 mit einer Teststärke von 80% feststellen zu können?
+
+Effekt = 0.2 Streuung = 1 alpha = 0.01 Power = 0.8 n = gesucht!
+
+```{r}
+Effekt = 0.2
+Streuung = 1
+power = 0.8
+alpha = 0.01
+
+power.t.test(power = power, delta = Effekt, sd = Streuung, sig.level = alpha) 
+```
+
+Ergebnis: n = 586

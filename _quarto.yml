@@ -1,0 +1,30 @@
+project:
+  type: website
+  render:
+    - index.qmd
+    - vorlesung/R-Code-Vorlesung.qmd
+    - klausurvorbereitung/Klausurvorbereitung.qmd
+
+website:
+  title: "Statistik für Biologen"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Start
+      - href: vorlesung/R-Code-Vorlesung.qmd
+        text: R-Code der Vorlesung
+      - href: klausurvorbereitung/Klausurvorbereitung.qmd
+        text: Klausurvorbereitung
+    tools:
+      - icon: github
+        href: https://github.com/TheoreticalEcology/BScStatistikUndBioinformatik
+
+lang: de
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+
+execute:
+  freeze: auto

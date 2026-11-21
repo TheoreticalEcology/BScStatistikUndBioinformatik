@@ -1,0 +1,343 @@
+---
+title: "Woche 4 - Regression"
+author: "Florian Hartig"
+date: "10/24/2018"
+output:
+  html_document:
+    df_print: paged
+editor_options:
+  chunk_output_type: console
+---
+
+```{r global_options, include=FALSE}
+Sys.setlocale("LC_ALL", "de_DE.UTF-8")
+knitr::opts_chunk$set(fig.width=5, fig.height=5)
+```
+
+
+# Likelihood mit Hand
+
+Nehmen wir doch mal die schon bekannten Daten Plantgrowth - ich extrahiere hier nur die Variable gewicht, für die Gruppe ctrl (Kontrolle)
+
+```{r}
+x = PlantGrowth$weight[PlantGrowth$group == "ctrl"]
+```
+
+Nehmen wir mal an, die Daten sind normalverteilt, und wir wollen die Likelihood für 2 alternative Parameter (Mittelwert, Standardabweichung) der Normalverteilung ausrechnen
+
+
+```{r}
+
+x = rnorm(10, mean = 5, sd = 1)
+mean(x)
+
+hist(x)
+# Log Likelihood für parameter Variante 1
+
+t.test(x)
+
+sum(dnorm(x, mean = 4, sd = 2, log = T))
+
+# Log Likelihood für parameter Variante 2
+sum(dnorm(x, mean = 5, sd = 1.5, log = T))
+
+
+sum(dnorm(x, mean = mean(x), sd = sd(x), log = T))
+
+```
+
+Bemerkung: die Funktion dnorm berechnet erst die log Likelihood für jeden Datenpunkt einzeln. Durch den Befehl sum werden dann alle Likelihoods aufsummiert, wodurch sich die Gesamtlikelihood ergibt. 
+
+Warum summiert, eigentlich werden Wahrscheinlichkeiten ja multipliziert? Weil wir mit den log Wahrscheinlichkeiten arbeiten, log(a*b) = log(a) + log(b)
+
+Und warum arbeiten wir mit dem log? Weil so die Werte besser lesbar sind (unlogarithmierte Likelihoods) sind sehr klein, und außerdem der Computer of numerische Problem bekommen kann
+
+
+# Beispiele Regression
+
+Machen Sie sich noch mal klar - die lineare Regression sucht den MLE von Abhängigkeiten zwischen 2 Variablen, die sich durch eine Gerade oder Kurve beschreiben lassen, mit den folgenden Einschränkugen
+
+* Die Streuung um die Kurve (in y-Richtung) folgt einer Normalverteilung 
+* Die Parameter der Kurve gehen linear in die Formel ein (deshalb lineare Regression)
+
+Um die Anwendung der Regression zu veranschaulichen benutzen wir Daten von klassischen landwirtschaftlichen Versuchen aus dem Paket 'agridat'
+
+```{r}
+#install.packages("agridat")
+library(agridat)
+```
+
+## Überleben und Wachstum von tropischen Bäumen
+
+siehe ?williams.trees für Details
+
+Survival = % Überlebende, height = Höhe
+
+#### Daten
+
+```{r}
+head(williams.trees)
+plot(height ~ survival, data = williams.trees)
+```
+
+
+#### Regression
+
+Macht ökologisch vielleicht nicht 100% Sinn, aber wir wollen mal testen, ob die Höhe in den verschieden Versuchsflächen durch die Überlebensrate in den Flächen erklärt werden kann, d.h. wir gehen davon aus, dass die Höhe von der Überlebensrate beeinflusst wird
+
+```{r}
+fit <- lm(height ~ survival, data = williams.trees)
+summary(fit)
+```
+
+Stellen Sie sicher dass Sie diesen Output interpretieren können.
+
+Hinweis: Schauen Sie noch mal in die Vorlesungsunterlagen, wie das Output in R zu interpretieren ist!
+
+* Wie ist der gefittete Zusammenhang? Zeigt die Regression eine Zu- oder Abnahme der abhängigen Variable bei einer Zunahme der unabhängigen Variable an?
+* Wie weit ist das Konfidenzinterval für den Schätzer Effekt der erklärenden Variable (95% CI ungefähr 1.96 * Std. Error)
+* Zeigt die Regression an dass der Effekt der erklärenden Variable auf die abhängige Variable signifikant ist?
+* Wie gut ist die Korellation mit der erklärenden Variable (Multiple R-squared) - Hinweis: man sagt hier auch oft: wie viel Prozent der Varianz erklärt das Modell. 
+* Sehen die Residuen symmetrisch aus? (schauen sie auf die Q1, Median, Q2)
+
+
+Lösungen: 
+
+* Zunahme der abhängigen Variable bei einer Zunahme der unabhängigen Variable.
+* 1.96 * 0.8728, also ungefähr 2 * 0.8728 = 1.7. Das Konfidenzinterval ist also 6.2 +- 1.7 das heißt (4.5 bis 7.9). 
+* ja
+* das Modell erklärt circa 21 % der Varianz. 
+* Der Mittelwert der Residuen eines (erfolgreich angepassten) Modells ist immer 0. Da der Median kleiner ist als 0, scheinen die Residuen leicht schief zu sein: rechtsschief! Hier noch mal überprüft:
+
+
+#### Visuelles Ergebnis
+
+```{r}
+plot(height ~ survival, data = williams.trees)
+abline(fit, col = "red", lwd = 2)
+```
+
+
+#### Residuen checken
+
+Nach der Regression immer Residuen checken. 
+
+```{r}
+par(mfrow = c(2,2))
+plot(fit)
+```
+
+Problem: Varianz nimmt zu -> Varianzheterogenität. 
+
+## Mangold Blätter
+
+siehe ?mercer.mangold.uniformity für Details
+
+Ertrag von Blättern und Wurzeln!
+
+
+#### Daten
+
+```{r}
+plot(roots ~ leaves, data = mercer.mangold.uniformity)
+```
+
+
+#### Regression
+
+```{r}
+fit = lm(roots ~ leaves, data = mercer.mangold.uniformity)
+summary(fit)
+```
+
+**Versuchen Sie mit Ihrem Nachbarn, Antworten auf die folgenden Fragen zu finden (gleiches Schema wie zuvor). Sie haben 8 Minuten Zeit**
+
+* Wie ist der gefittete Zusammenhang? Zeigt die Regression eine Zu- oder Abnahme der abhängigen Variable bei einer Zunahme der unabhängigen Variable an?
+* Wie weit ist das Konfidenzinterval für den Schätzer Effekt der erklärenden Variable (95% CI ungefähr 1.96 * Std. Error)
+* Zeigt die Regression an dass der Effekt der erklärenden Variable auf die abhängige Variable signifikant ist?
+* Wie gut ist die Korellation mit der erklärenden Variable (Multiple R-squared) - Hinweis: man sagt hier auch oft: wie viel Prozent der Varianz erklärt das Modell.
+* Sehen die Residuen symmetrisch aus? (schauen sie auf die Q1, Median, Q2)
+ 
+
+#### Visuelles ergebnis
+
+```{r}
+plot(roots ~ leaves, data = mercer.mangold.uniformity)
+abline(fit, col = "red", lwd = 2)
+```
+
+#### Residuen 
+
+```{r}
+par(mfrow = c(2,2))
+plot(fit)
+```
+
+Sieht eigentlich OK aus ... ein bisschen scheint es so als weichen die Datepunkte in der Mitte mehr nach oben und an den Rändern mehr nach unten ab. Das könnte bedeuten dass die Beziehung nicht linear ist. 
+
+#### Quadratischer Effekt 
+
+Probieren wir doch mal ob es Anzeichen für einen zusätzlichen quadratischen Effekt gibt, d.h. statt des alten Modells 
+
+roots = a0 * a1 * leaves
+
+fitten wir jetzt 
+
+roots = a0 * a1 * leaves + a2 * leaves^2
+
+also eine quadratische Funktion, oder auch Polynom 2. Grades. 
+
+```{r}
+fit2 <- lm(roots ~ leaves + I(leaves^2), data = mercer.mangold.uniformity)
+summary(fit2)
+```
+
+Wie sie sehen ist der quadratische Term wirklich siginifikant. 
+
+#### Visuelles ergebnis
+
+```{r}
+plot(roots ~ leaves, data = mercer.mangold.uniformity)
+nLeave = seq(35,70, len = 100)
+lines(nLeave, predict(fit2, newdata = data.frame(leaves = nLeave)), col = "red", lwd = 2)
+```
+
+Wir könne auch die Likelihoods der beiden Modelle vergleichen 
+
+```{r}
+logLik(fit)
+logLik(fit2)
+```
+
+Ein Unterschied von 7 - das sieht erst mal nicht so viel aus, aber machen Sie sich klar dass das log Werte sind, d.h. die Wahrscheinlichkeit der Daten sind für Modell 2 1000x höher als für Modell 1 
+
+```{r}
+exp(7)
+```
+
+Heißt dass auch das Modell 2 1000x wahrscheinlich ist? Natürlich nicht, nach den üblichen Argumenten - die Likelihood ist die Wahrscheinlichkeit der Daten, sie können die nicht ohne weiteres umdrehen (s.o.).
+
+Außerdem sollten Sie bedenken dass ein flexibleres Modell (mehr Parameter) immer besser an die Daten passt - d.h. die Likelihood wird nie schlechter wenn Sie einen Parameter dazunehmen, denn das alte Modell ist ja in dem neuen enthalten.
+
+Die Daumenregel ist dass eine Verbesserung in der log Likelihood kleiner als 2 keine signifikante Evidenz für das komplizertere Modell zeigt (wir besprechen das nächste Woche noch mal genauer). Bei einem Unterschied wie hier von 7 würde man aber schon sagen dass das Modell mit dem quadratische Effekt besser ist. 
+
+
+#### Residuen 
+
+```{r}
+par(mfrow = c(2,2))
+plot(fit2) 
+```
+
+Jetzt sehen die Residuen deutlich stabiler aus, aber ist ist immer noch etwas Varianzinhomogenität zu bemerken ... das würden wir aber jetzt erst mal wieder akzeptieren.
+
+## Ernte von Apfelbäumen
+
+siehe ?pearce.apple für Details
+
+#### Daten
+
+Es geht um den Ernteerfolg von Apfelbäumen. Der Unterschied zu den vorherigen Datensätzen ist dass wir jetzt eine kategoriale erklärende Variable haben
+
+```{r}
+plot(yield ~ block, data = pearce.apple)
+```
+
+#### Regression mit kategorialen Prediktoren
+
+In R gibt man die Regression völlig identisch ein, aber man muss aufpassen mit der Interpretation
+
+```{r}
+fit <- lm(yield ~ block, data = pearce.apple)
+summary(fit)
+```
+
+Machen Sie sich klar dass die Parameter so zu interpretieren sind
+
+* Intercept = erste Möglichkeit des kategorialen Prediktors (hier B1)
+* Die Effekte für B2, B3, B4 sind der UNTERSCHIED zu B1
+
+* D.h. der Schätzer für B4 ergibt sich aus Intercept 235.5 + blockB4 114.8, also ungefähr 350 
+* Auch die Hypothesentests sind immer im Unterschied zu Intercept, also B1.
+
+**Stellen Sie sicher dass Sie das ordentlich interpretieren könnten.**
+
+#### Residuen 
+
+Bei kategorialen Variablen sollte man immer für die einzelnen Gruppen plotten
+
+```{r}
+plot(residuals(fit) ~ block, data = pearce.apple)
+```
+
+hmm ... naja. Der Datensatz ist halt nicht besonders groß. Die Schwankungen könnten auch Zufall sein. 
+
+# ANOVA
+
+Zu allerletzt wollte ich Ihnen noch was zeigen. Bei den kategorialen Prediktoren hat man ja das Problem dass der p-Wert (und der Schätzer) immer Bezug auf die erste Gruppe nimmt. Vielleicht würde man aber gerne wissen ob block überhaupt einen Effekt hat. Dafür gibt es einen speziellen und sehr bekannten Test, die ANOVA = Analysis of Variance. 
+
+Die Nullhypothese der Anova ist: könnten die Daten aus einem Modell stammen in dem Block insgesamt keinen Effekt hat. Die Antwort bekommt man dann mit 
+
+```{r}
+summary(aov(fit))
+```
+
+Signifikant, also nein - die ANOVA sagt uns dass es einen Effekt von Block gibt, aber nicht welcher Block sich von welchem unterscheidet. 
+
+Also, mit der ANOVA schätzen sie die Gesamt-Signfikanz eines kategorialen Prediktors. Das zugrundeliegende statistische Modell ist identisch zu dem Modell der linearen Regression. 
+
+
+# Ihr Datensatz
+
+Daten einlesen
+
+```{r}
+# Sys.setlocale("LC_ALL", "de_DE.UTF-8")
+daten = read.csv("../Woche1/Biostatistik Umfrage2.csv", encoding = "UTF-8")
+colnames(daten) = c("Zeit", "Einwohner", "Distanz", "Größe", "Gewicht", "Studium", 
+                    "Wohnung", "Geschlecht", "Hand", "Augen", "Transport", "Getraenk", "Vegetarier")
+```
+
+
+## Kategoriale Assoziationen  
+
+Könnten wir eignetlich auch mit einer Regression testen, aber nicht mit der normalen linearen Regression. Was wir hier bräuchten sind die sogenannte generalisierten linearen Modelle (GLM). Das machen wir in 2 Wochen
+
+## Die Assoziazion kat + num
+
+```{r}
+boxplot(Größe ~ Geschlecht, data = daten)
+```
+
+Die t.test Funktion geht entweder indem man die 2 Gruppen übergibt (t.test(A,B)), oder mit einer Formel so wie ein Boxplot - hier einfacher, weil wir das ja schon so vorliegen haben
+
+```{r}
+fit = lm(Größe ~ Geschlecht, data = daten)
+summary(fit)
+```
+
+Was gibt es denn noch so?
+
+```{r}
+boxplot(Gewicht ~ Vegetarier, data = daten)
+```
+
+```{r}
+fit = lm(Gewicht ~ Vegetarier, data = daten)
+summary(fit)
+```
+
+
+## Korrelation (num + num)
+
+```{r}
+plot(Gewicht ~ Größe, data = daten)
+```
+
+
+```{r}
+fit = lm(Gewicht ~ Größe, data = daten)
+summary(fit)
+```
+
+

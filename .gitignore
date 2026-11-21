@@ -4,3 +4,23 @@
 .Ruserdata
 *.csv
 Rplot03.pdf
+*.bak
+
+.DS_Store
+_to_delete/
+
+/.quarto/
+/_site/
+
+**/*.quarto_ipynb
+
+# Render-Reste ausserhalb von _site (Einzeldatei-Render)
+/site_libs/
+vorlesung/*.html
+vorlesung/*_files/
+klausurvorbereitung/*.html
+klausurvorbereitung/*_files/
+
+# lokale Werkzeug-Ordner
+.claude/
+__pycache__/

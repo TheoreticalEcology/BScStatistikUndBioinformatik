@@ -1,0 +1,391 @@
+---
+title: "Woche 4 - Hypothesesntests"
+author: "Maximilian Pichler"
+format: 
+  html:
+    toc: true
+    embed-resources: true
+    self-contained-math: true
+editor: 
+  markdown: 
+    wrap: 72
+---
+
+## Offene Fragen
+
+### R - Zwischenergebnisse abspeichern
+
+Um Werte oder Ergebnisse zwischenzuspeichern koennt ihr diese in
+Variabeln abspeichern:
+
+```{r}
+# T.test
+t.test(1:10, y = c(7:20)) 
+fit <- t.test(1:10, y = c(7:20)) 
+print(fit)
+```
+
+### Prop.test
+
+Wenden wir uns noch mal dem Beispiel von Robert Rutledge, Annals of
+Surgery (1993) zu, für die Mortalität von Unfallopfern mit und ohne
+Sicherheitsgurt. Daten einlesen in R:
+
+```{r}
+survivors <- matrix(c(1781,1443,135,47), ncol=2)
+colnames(survivors) <- c('survived','died')
+rownames(survivors) <- c('no seat belt','seat belt')
+```
+
+Geben Sie nun z.B. survivors in R ein, um die Kontingenztabelle
+anzuzeigen. Wenn Sie wollen, können Sie auch ein Balkendiagramm
+erstellen, um die Assoziation zu visualisieren (siehe letzte Woche).
+
+Kontigenztabelle:
+
+```{r}
+survivors
+```
+
+Balkendiagramm:
+
+```{r}
+barplot(t(survivors))
+```
+
+**Wenden Sie den prop.test auf die Daten an. Welche der folgende
+Aussagen sind richtig:**
+
+**H0: Kein Unterschied in der Rate von nicht gestorben zu gestorben
+zwischen kein Gurt und Gurt getragen**
+
+```{r}
+prop.test(survivors) 
+```
+
+p-value ist 8.105e-07 und damit \$\<\alpha (5%) \$ und somit stat.
+signifikant und wir haben einen signifikanten Unterschied gefunden!
+
+Aussagen:
+
+-   Der MLE für die Überlebensraten steigt von 0.9295407 auf 0.9684564,
+    wenn ein Gurt getragen wird
+-   Der absolute Unterschied der Überlebenswahrscheinlichkeit ist ca.
+    3.89 %, mit einem CI 2.38% bis 5.40%
+-   Relativ gesehen (basierend auf den MLEs) ist das Sterberisiko einer
+    Person mit Sicherheitsgurt nur etwa ca. 44% im Vergleich zu dem
+    Risiko ohne Gurt
+
+### Lineare Regression
+
+#### Freiheitsgrade
+
+Freiheitsgrade sind die Anzahl an unabhaengigen Informationen die in das
+Model fuer das Schaetzen der Parameter eingehen.
+
+Berechnung:
+
+Freiheitsgrade (df) = N_Beobachtungen - N_Parameteranzahl
+
+#### Residuen
+
+Residuen sind die "Reste" bzw die vertikalen Abstaende zwischen der
+Regressiongerade und den Beobachtungen:
+
+```{r}
+## Daten generation IGNORE!!
+set.seed(42)
+Temperatur = runif(50)
+Wachstum = Temperatur + rnorm(50)
+##
+```
+
+```{r}
+model = lm(Wachstum ~ Temperatur)
+plot(Temperatur, Wachstum)
+abline(model, col = "red", lwd = 2)
+```
+
+```{r}
+plot(Temperatur, Wachstum)
+abline(model, col = "red", lwd = 2)
+predictions = predict(model)
+for(i in 1:20)  segments(Temperatur[i], predictions[i], Temperatur[i], Wachstum[i], col = "green")
+legend("bottomright", bty = "n", legend = "Resdiuum (vertikaler Abstand)", col = "green", lty = 1)
+```
+
+-   Die Summe der Residuen wird minimiert um die Gerade zu finden die
+    die Daten am besten erklaert (MLE).
+-   Die Residuen die am Ende noch uebrig bleiben, geben Aufschluss ueber
+    den goodness of fit (R\^2)
+
+#### R-squared
+
+R-squared gibt an wie viel Varianz in der abhaengigen Variable durch
+unser Model erklaert werden....
+
+...was bedeutet das?
+
+Der R-squared kann auf 2 Arten berechnet werden:
+
+1.  R\^2 = 1 - sum of squared residuals (SSR) / total sum of squares
+    (SST)
+
+Berechnung:
+
+```{r}
+1 - sum((Wachstum - predictions)**2)/sum((Wachstum - mean(Wachstum))**2)
+```
+
+Visuell:
+
+```{r}
+plot(Temperatur, Wachstum)
+abline(model, col = "red", lwd = 2)
+predictions = predict(model)
+for(i in 1:20)  segments(Temperatur[i], predictions[i], Temperatur[i], Wachstum[i], col = "green")
+legend("bottomright", bty = "n", legend = "Resdiuum (vertikaler Abstand)", col = "green", lty = 1)
+abline(lm(Wachstum~1), col = "black", lwd = 2)
+for(i in 1:20)  segments(Temperatur[i]+0.01, predict(lm(Wachstum~1))[i], Temperatur[i]+0.01, Wachstum[i], col = "blue")
+
+```
+
+#### Frage 8
+
+Der folgende Code führt eine lineare Regression für die Abhängigkeit von
+Ozon in der Luft von der Sonneneinstrahlung durch:
+
+```{r}
+plot(Ozone ~ Solar.R, data = airquality)
+fit = lm(Ozone ~ Solar.R, data = airquality)
+summary(fit)
+```
+
+Ozone = 18.59 + 0.12717\*x (x = Solar.R)
+
+-   Bei einer Sonneneinstrahlung von 0 sagt das Modell einen Ozongehalt
+    von ca. 18.59 vorher
+-   Bei einer Sonneneinstrahlung von 100 würde das Modelle einen
+    Ozongehalt von ca. 18.59 + 0.12717 \* 100 vorhersagen
+
+#### Frage 9 Residueen check
+
+```{r}
+par(mfrow = c(2,2))
+plot(fit)
+```
+
+#### Frage 10 Faktor
+
+Im folgenden die Daten und eine lineare Regression für ein Experiment,
+in dem verschiedene Insektizide verglichen wurden. Als abhängige
+Variable wurde die Anzahl von Insekten in einem standardisierten
+Verfahren aufgenommen.
+
+```{r}
+boxplot(count ~ spray, data = InsectSprays,
+        xlab = "Type of spray", ylab = "Insect count",
+        main = "InsectSprays data", varwidth = TRUE, col = "lightgray")
+
+fit <- lm(count ~ spray, data = InsectSprays)
+summary(fit)
+```
+
+Wichtig: Intercept entspricht dem 1. level des 1. Faktores
+
+Geben Sie den Code in R ein. Welche der folgenden Aussagen treffen zu:
+
+-   Der Schätzer für die Anzahl Insekten für das erste Pestizid (A) ist
+    14.5000
+-   Das Konfidenzintervall für Spray A ist am kleinsten
+-   Der Unterschied zwischen Spray A und Spray D ist signifikant
+-   Die Regression erklärt ca. 72% der Varianz in den Insektenzahlen,
+    d.h. r2 = 0.72
+
+#### Frage 11 Anova
+
+Wenn Sie sich das Ergebnis der vorherigen Regression in der Variable fit
+gespeichert haben, können Sie eine Anova berechnen. Wie interpretieren
+Sie das Ergebnis?
+
+```{r}
+anova(fit)
+```
+
+Problem: Frage nach der Gesamtsignifikanz der spray variable, das geht
+in der LM nicht da dort die Variable in die einzelnen levels aufgeteilt
+wird
+
+Loesung: Die anova testet die Gesamtsignifikanz von kategorischen
+Variablen in dem es Modelle mit und ohne die Variable vergleicht
+
+-   Die Variable Spray hat einen signifikanten Effekt auf die
+    Insektenzahlen, d.h. Sie können die Nullhypothese ablehnen, dass die
+    Mittelwerte für alle Insektizide eigentlich gleich sind
+-   Spray erklärt einen Wert von 2668.8 der Gesamtvarianz, während die
+    residuelle Varianz 1015.2 ist. Hieraus ergibt sich dann der R2 des
+    Modells 0.72 (errechnet durch 2668.8 / (2668.8 + 1015.2) )
+-   Das Modell verbraucht für die Variable Spray 5 Freiheitsgrade
+    (English degrees of freedom / df), d.h. für die Variable Spray
+    müssen 5 zusätzliche Parameter berechnet werden im Vergleich zu
+    einem Modell ohne die Variable (d.h. nur Mittelwert)
+
+## Uebungen
+
+### Aufgabe 1
+
+```{r}
+set.seed(42)
+Zeit = runif(50, 0, 5)
+Kolonien = 20 + Zeit**2 + rnorm(50, sd = 0.7)
+```
+
+```{r}
+plot(Kolonien~Zeit, ylim = c(-20, 45))
+abline(model, col = "red")
+```
+
+```{r}
+model = lm(Kolonien ~ Zeit)
+summary(model)
+```
+
+**Fragen**:
+
+-   Welchen Zusammenhang unterstellt das Modell?
+-   Wo finden Sie die Parameter für Steigung und y-Achsen-Abschnitt?
+    Schreiben Sie die Geradengleichung des Modells auf
+-   Wo finden Sie die Parameter für Steigung und y-Achsen-Abschnitt?
+    Schreiben Sie die Geradengleichung des Modells auf
+-   Hat Zeit einen signifikanten Effekt auf Kolonien?
+-   Wie groß ist der Anteil der Varianz, der durch das Modell erklärt
+    wird?
+
+::: {.callout-tip collapse="true" appearance="minimal" icon="false"}
+## Solution
+
+$$
+Y = a_0 + a_1 \cdot x
+$$
+
+$$
+Y = 15.25 + 5.319 \cdot x
+$$
+
+Ja, Zeit hat einen signifikanten Effekt auf Kolonien denn der p-value
+ist $<0.05$
+
+Multiple R-squared ist 0.922, das Model erklaert also 92% der Varianz
+:::
+
+**Residuenplot**
+
+```{r}
+par(mfrow = c(2, 2))
+plot(model)
+par(mfrow = c(1,1))
+
+```
+
+-   Gibt es ein Muster im Residuen vs. Fitted- Plot? Sind die Residuen
+    normalverteilt?
+-   Würden Sie basierend auf diesen Plots den Ergebnissen im Output
+    glauben?
+
+::: {.callout-tip collapse="true" appearance="minimal" icon="false"}
+## Solution
+
+Ja, es gibt ein Muster, der Residuals vs Fitted Plot zeigt dass die
+funktionelle Form nicht richtig getroffen wurde. Auch der Normal Q-Q
+Plot zeigt dass die Residuen nicht normalverteilt sind. Der
+Scale-Location plot zeit dass sich die Varianz der Residuen veraendert.
+
+**Schlussfolgerung: Wir muessen unser Model anpassen!**
+:::
+
+### Aufgabe 2
+
+```{r}
+plot(Kolonien~Zeit)
+```
+
+Loesung fuer unser Problem: Quadratischer Effekt!
+
+```{r}
+model = lm(Kolonien ~ I(Zeit^2) )
+summary(model)
+```
+
+**Fragen**:
+
+-   Schreiben Sie die Gleichung des neuen Modells auf.
+
+::: {.callout-tip collapse="true" appearance="minimal" icon="false"}
+## Solution
+
+$$
+Y = a_0 + a_1 \cdot x^2
+$$
+
+$$
+Y = 19.9 + 1.00 \cdot x^2
+$$
+
+Ja, Zeit hat einen signifikanten Effekt auf Kolonien denn der p-value
+ist $<0.05$
+
+Multiple R-squared ist 0.9935z
+:::
+
+```{r}
+par(mfrow = c(2, 2))
+plot(model)
+par(mfrow = c(1,1))
+```
+
+### Aufgabe 3 - Kausalitaet
+
+```{r}
+set.seed(42)
+Vorerkrankung = runif(5000, -1, 1)
+Medikament = rbinom(5000, 1, plogis(Vorerkrankung))
+Herzinfaktrisiko = 5 -Medikament + 4*Vorerkrankung + rnorm(5000, sd = 0.2) 
+
+```
+
+```{r}
+boxplot(Herzinfaktrisiko~Medikament)
+```
+
+Signifikanter Effekt von Medikament auf Herzinfaktrisiko?
+
+```{r}
+model = lm(Herzinfaktrisiko~factor(Medikament))
+summary(model)
+```
+
+Positiver Effekt des Medikamentes??!?!
+
+Mit Confounder:
+
+```{r}
+model = lm(Herzinfaktrisiko~factor(Medikament) + Vorerkrankung)
+summary(model)
+```
+
+### Aufgabe 4 - Airquality
+
+```{r}
+m =  lm(Ozone~Temp+Wind, data = airquality)
+summary(m)
+```
+
+```{r}
+m =  lm(Ozone~Temp*Wind, data = airquality)
+summary(m)
+```
+
+```{r}
+library(effects)
+plot(allEffects(m))
+```

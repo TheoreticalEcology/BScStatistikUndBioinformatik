@@ -1,0 +1,307 @@
+---
+title: "Woche 6 - GLM"
+author: "Florian Hartig"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    toc: yes
+editor_options:
+  chunk_output_type: console
+---
+
+```{r global_options, include=FALSE}
+Sys.setlocale("LC_ALL", "de_DE.UTF-8")
+knitr::opts_chunk$set(fig.width=5, fig.height=5)
+```
+
+# Augenfarbe und Vegetatrier in ihrem Datensatz
+
+Daten einlesen
+
+```{r}
+# Sys.setlocale("LC_ALL", "de_DE.UTF-8")
+daten = read.csv("../Woche1/Biostatistik Umfrage2.csv", encoding = "UTF-8")
+colnames(daten) = c("Zeit", "Einwohner", "Distanz", "Größe", "Gewicht", "Studium", 
+                    "Wohnung", "Geschlecht", "Hand", "Augen", "Transport", "Getraenk", "Vegetarier")
+```
+
+
+Frage: ist die Augenfarbe ein Prädikor für Vegetatrier?
+
+Wiederholung - deskriptive Analyse
+
+```{r}
+Kreuztabelle = table(daten$Vegetarier, daten$Augen)
+barplot(Kreuztabelle, beside = T)
+```
+
+Testen wir das ganze doch mal mit einen klassischen Hypothesentest - ich drehe hier die Tabelle um 90 Grad - Befehl t() = transpose - damit das für den Test passt, so testen wir, ob die Proportion von Vegetarien sich in den 3 Klassen unterscheidet. 
+
+```{r}
+prop.test(t(Kreuztabelle))
+```
+
+Fast signifikant. Außerdem sehen wir die MLEs für die Anzahl Vegetarier Kategorie 
+
+    prop 1     prop 2     prop 3 
+0.14285714 0.06666667 0.35714286 
+
+
+wobei die Kategorien hier wiefolgt sind (der Befehl levels() zeigt die Kategorien einer kategorialen Variable an)
+
+```{r}
+levels(daten$Augen)
+```
+
+Was sagt denn das glm?
+
+```{r}
+fit <- glm(Vegetarier ~ Augen, data = daten, family = "binomial")
+summary(fit)
+```
+
+Tja, da ist auch nichts signfikant. Hätten wir uns denken können. Aber was sagt das GLM denn jetzt für jede Augenfarbe vorraus? Blau ist ja die Referenz, d.h. der Wert von Intercept entspricht blau. 
+
+Der Wert ist 1.7918 - was heißt das denn jetzt in Wahrscheinlichkeiten, d.h. wie wahrscheinlich ist es, Vegetarier zu sein, wenn die Augenfarbe blau ist?
+
+Dazu müssen wir den Wert des lineare Prädiktors mit der Link Funktion transformieren. Bei der logistischen Regression ist der Link logit - die inverse Logit Funktion in R heißt plogis. Also haben wir 
+
+```{r}
+plogis(1.7918)
+1-plogis(1.7918)
+```
+
+Wir müssen hier 1-plogis(1.7918) rechnen, um auf den gleichen Wert wie der prop.test zu kommen, weil aufgrund der Codierung der Daten das GLM die Wahrscheinlichkeit rechnent, nicht Vegetarier zu sein. 
+
+OK, super, da kamen schon mal die gleichen Werte raus, das macht also Sinn. Was könnten wir denn noch machen mit dem GLM?
+
+Wie viel Varianz wird denn erklärt durch die Augenfarbe?
+
+Hier rechnen wir 
+
+```{r}
+1 - 48.564 / 52.942
+```
+
+8% ... das ist nicht viel ... wobei, was hätten Sie denn erwartet? Sollte es überhaupt einen Effekt der Augenfarbe geben? Wenn nicht, dann würden sie das so interpretieren, als ob das 8% Erklärung sind, die letzten Endes durch das Rauschen der Daten kommen. 
+
+Außerdem gab es da doch noch die ANOVA. Wenn wir die ANOVA auf das GLM machen, entspricht das ungefährt dem prop.test, denn beide stellen die gleiche Frage: gibt es denn überhaupt einen Effekt der Augenfarbe. Oder genauer gesagt: beide haben die gleiche Nullhypothese H0: die Augenfarbe hat keinen Einfluss.
+
+ANOVA für das GLM ist leicht anders als für das LM, weil man hier den Test mit Hand angeben muss. Wenn Sie 
+
+```{r}
+print(anova(fit))
+```
+
+machen, werden nämlich keine p-Werte berechent. Das liegt daran, dass R Sie daran erinnert will, dass Sie den geeignente Test auswählen müssen. Grob gesagt gilt folgenden Regel
+
+* Verteilungen mit fester Varianz (z.B. Binomial, Poisson) testen wir mit test = "Chisq"
+* Verteilungen mit fester Varianz (z.B. quasi-Verteilungen) testen wir mit test = "F"
+
+```{r}
+print(anova(fit, test = "Chisq"))
+```
+
+Das Ergebnis hier ist leicht anders als beim prop.test. Das liegt daran, dass wir hier zwar die gleiche H0 testen, aber mit einer leicht anderen Methode. Wir könnten hier auch ein bisschen mit r2 rumrechnen
+
+```{r}
+ResDevianceNull = 52.942
+ResDevianceAugen = 48.564
+DevianceAugen = 4.3787
+# Augen erklären
+DevianceAugen  / ResDevianceNull
+# Das ist identisch dazu, zu berechnen: 1 - was Augen nicht erklären 
+1 - ResDevianceAugen / ResDevianceNull
+# Und natürlich auch identisch zu der Berechnung vorher
+```
+
+
+Natürlich könnten wir auch mehr Prädikoren dazunehmen. 
+
+
+```{r}
+fit <- glm(Vegetarier ~ Augen + Transport, data = daten, family = "binomial")
+summary(fit)
+print(anova(fit, test = "Chisq"))
+```
+
+Die Interpretation des folgenden Outputs machen wir jetzt als Übung. Wie würden Sie die Ergebnisse zusammenfassen?
+
+# Schnäpper
+
+```{r}
+library(EcoData)
+str(birdfeeding)
+plot(feeding~attractiveness, data = birdfeeding)
+
+fit <- glm(feeding~attractiveness, data = birdfeeding, family = "poisson")
+summary(fit)
+```
+
+
+# Beispiel - Poisson Regression
+
+```{r}
+library(EcoData)
+
+data(volcanoisland)
+head(volcanoisland)
+plot(beetles ~ altitude, data = volcanoisland)
+```
+
+
+```{r}
+fit <- glm(beetles ~ altitude + I(altitude^2) + habitatQuality, data = volcanoisland, family = "poisson")
+summary(fit)
+anova(fit, test = "Chisq")
+```
+
+Man kann auch die GLMs mit dem effects package visualisieren, welches wir schon bei der multiple Regression benutzt hatten
+
+```{r}
+library(effects)
+plot(allEffects(fit))
+```
+
+
+War da nicht noch was? Ja, genau, wir sollten ja eigentlich noch Residuen checken. Es gibt hier 2 Möglichkeiten:
+
+Möglichkeit a) sind die sogenannten standardisierten Residuen. Was heißt das? Wir hatten ja schon gesehen, dass die Varianz der Poisson Verteilung mit dem Mittelwert zunimmt. 
+
+```{r}
+plot(
+  predict(fit),
+  residuals(fit, type = "response")
+)
+```
+
+Was wir hier sehen ist typisch für Zähldaten - die Streuung nimmt mit dem Mittelwert zu. Das ist aber ja schon in den Annahmen der Poisson Regression drin. Deshalb macht es keinen Sinn, die sogenannten "rohen Residuen" anzuschauen - wir müssen die Residuen "standardisieren" auf die Verteilung, die wir erwarten (Poisson), um zu sehen, ob die Zunahme (und der Absolutwert der Streuung) so ist, wie wir das unter einer Poisson Verteilung erwarten würden. 
+
+Die einfachste Möglichkeit sind did sogenannten Pearson Residuen - hier teilt man einfach das absolute Residuum durch die erwartete Standardabweichung der Poisson Verteilung. Sie bekommen diese über residuals(fit, type = "pearson"), also
+
+```{r}
+plot(
+  predict(fit),
+  residuals(fit, type = "pearson")
+)
+```
+
+Jetzt würde man eigentlich erwarten, dass alles homogen aussieht, und 95% der Daten innerhalb +/- 2 sd liegen (Annahme, das die Poisson Verteilung ähnlich der Normalverteilung ist). 
+
+Leider ist diese Annahme aber nur eine Approximation, und oft sind auch bei einem perfekt fittenden Modell die Pearson Residuen nicht 100% homogen. Der Grund ist, dass, wie wir in der Vorlesung gesehen haben, sich die Form der Poisson Verteilung mit dem Mittelwert ändert. 
+
+Ohne jetzt tiefer in die Theorie zu gehen: man kann die Residuen so transformieren, dass auch die Form korrigiert wird - wenn man das macht, erwartet man komplett homogene Residuen (gleichverteilt), wenn das Modell stimmt. Das Ganze geht mit dem Package DHARMa, dass praktischerweise auch gleich noch einen Test auf Varianzüberschuss anbietet
+
+```{r}
+# install.packages("DHARMa")
+library(DHARMa)
+res <- simulateResiduals(fit)
+plot(res)
+testDispersion(res)
+```
+
+Was wir hier sehen ist, dass die Residuen deutlich weiter streuen, als wir das bei einem Poisson Modell erwarten würden. Wir sollten also auf ein quasi-Poisson Modell ausweichen 
+
+```{r}
+fit <- glm(beetles ~ altitude + I(altitude^2) + habitatQuality, data = volcanoisland, family = "quasipoisson")
+summary(fit)
+anova(fit, test = "Chisq")
+```
+
+Nebenbemerkung: das Problem mit der quasi-Poisson Verteilung ist, dass sich hier die Residuen schlecht testen lassen. Deshalb weicht man als fortgeschrittener Statistiker eigentlich lieber auf die negative Binominialverteilung aus, die auch noch eine Reihe von anderne Vorteilen hat. Wenn wir die genommen hätten, könnten wir jetzt weiter unsere Residuen testen, und sehen, dass das oben gefittete Modell noch weitere Problem hat, z.B. indem wir die Residuen gegen alle Prädiktoren plotten. 
+
+Wie man diese Problem alle beheben könnte lernen Sie in unseren R Blockkursen Einführung in R, und fortgeschrittene Statistik in R
+
+
+
+# Weitere Übungen
+
+analysieren Sie selbstständig die folgenden Daten
+
+## Airquality
+
+Abhängige Variable ist OZON
+
+```{r, eval = F}
+data(airquality)
+str(airquality)
+?airquality
+```
+
+
+## Affairs
+
+```{r, eval = F}
+library(Ecdat)
+data(Fair)
+str(Fair)
+?Fair
+
+fit <- glm(nbaffairs ~ sex + age + ym + religious + education + occupation + rate, data = Fair, family = poisson)
+summary(fit)
+
+```
+
+
+## Vergleich operative Eingriffe 
+
+```{r, eval = F}
+library(COUNT)
+data(azcabgptca)
+str(azcabgptca)
+?azcabgptca
+
+azcabgptca$procedure = factor(azcabgptca$procedure)
+azcabgptca$type = factor(azcabgptca$type)
+```
+
+
+## Low birth weight
+
+```{r, eval = F}
+library(COUNT)
+data(lbw)
+str(lbw)
+?lbw
+```
+
+
+## German Health reform
+
+```{r, eval = F}
+library(COUNT)
+data(rwm5yr)
+str(rwm5yr)
+?rwm5yr
+```
+
+
+
+## Vorkommen von Down Syndrom in British Columbia
+
+```{r, eval = F}
+library(boot)
+data(downs.bc)
+str(downs.bc)
+?downs.bc
+```
+
+
+## The 1907 Romanian Peasant Rebellion
+
+```{r, eval = F}
+library(carData)
+data(Chirot)
+str(Chirot)
+?Chirot
+
+```
+
+
+
+
+
+
+
+
+

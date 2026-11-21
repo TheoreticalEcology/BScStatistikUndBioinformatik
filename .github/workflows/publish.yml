@@ -1,0 +1,47 @@
+name: Website veröffentlichen
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@v7
+
+      - name: Quarto installieren
+        uses: quarto-dev/quarto-actions/setup@v2
+
+      # Der R-Code wird hier nicht ausgeführt: Die Ergebnisse liegen in _freeze/
+      # (freeze: auto in _quarto.yml). Nach Änderungen an Code-Chunks lokal
+      # `quarto render` ausführen und _freeze/ mit committen.
+      - name: Website rendern
+        run: quarto render
+
+      - name: Seite hochladen
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Auf GitHub Pages veröffentlichen
+        id: deployment
+        uses: actions/deploy-pages@v5
